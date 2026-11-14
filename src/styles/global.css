@@ -1042,7 +1042,7 @@ a {
 }
 .specs {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   border-top: 1px solid var(--night-line);
   border-bottom: 1px solid var(--night-line);
 }
@@ -1095,6 +1095,9 @@ a {
   }
   .spec:nth-child(n + 3) {
     border-top: 1px solid var(--night-line);
+  }
+  .spec:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
   .model__corner--tr,
   .model__corner--br {
@@ -1917,6 +1920,204 @@ a {
   }
   .shot--a {
     grid-column: 1 / -1;
+  }
+}
+
+/* ———————————— field: clinic pilot, competitions, videos ———————————— */
+.field {
+  padding-top: 0;
+}
+.field__grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 14px;
+}
+.fshot {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--bg-2);
+}
+.fshot__media {
+  position: absolute;
+  inset: 0;
+  transform: scale(1.12);
+  will-change: transform;
+}
+.fshot__media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.fshot__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* row 1: the ICU shot sets the height, the portrait stretches to match */
+.fshot--icu {
+  grid-column: span 7;
+  aspect-ratio: 4 / 3;
+}
+.fshot--team {
+  grid-column: span 5;
+}
+.fshot--team img {
+  object-position: 50% 45%;
+}
+.fshot--doctor,
+.fshot--stage {
+  grid-column: span 6;
+  aspect-ratio: 4 / 3;
+}
+.fshot__pin {
+  position: absolute;
+  width: max(30px, 9%);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.fshot__pin i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1.5px solid var(--cyan);
+  box-shadow:
+    0 0 0 1px rgba(11, 12, 14, 0.25),
+    0 0 18px rgba(56, 232, 245, 0.55);
+}
+.fshot__pin i::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: 50%;
+  border: 1.5px solid var(--cyan);
+  animation: pin-ping 2.2s var(--ease) infinite;
+}
+@keyframes pin-ping {
+  from {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  to {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+.fshot__pin .chip {
+  position: absolute;
+  left: calc(100% + 8px);
+  top: 50%;
+  transform: translateY(-50%);
+  background: var(--ink);
+  color: #fff;
+}
+.field__videos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: clamp(64px, 8vw, 120px);
+}
+.vid__frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--night);
+}
+.vid__frame iframe,
+.vid__poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.vid__poster {
+  padding: 0;
+  margin: 0;
+  background: none;
+  cursor: pointer;
+}
+.vid__poster:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: -6px;
+}
+.vid__poster picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.vid__poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.2s var(--ease);
+}
+.vid__poster:hover img {
+  transform: scale(1.03);
+}
+.vid__play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 72px;
+  height: 72px;
+  margin: -36px 0 0 -36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: rgba(11, 12, 14, 0.78);
+  color: #fff;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  transition:
+    transform 0.5s var(--ease),
+    background 0.3s;
+}
+.vid__play svg {
+  width: 20px;
+  height: 20px;
+  margin-left: 3px;
+}
+.vid__poster:hover .vid__play {
+  transform: scale(1.08);
+  background: var(--ink);
+}
+.vid__meta {
+  display: grid;
+  gap: 10px;
+  padding-top: 18px;
+}
+.vid__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+}
+.vid__link svg {
+  width: 11px;
+  height: 11px;
+}
+.vid__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 800px) {
+  .fshot--icu,
+  .fshot--doctor,
+  .fshot--stage {
+    grid-column: 1 / -1;
+  }
+  .fshot--team {
+    grid-column: 1 / -1;
+    aspect-ratio: 4 / 5;
+  }
+  .field__videos {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
   }
 }
 

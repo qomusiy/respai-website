@@ -6,8 +6,7 @@ import { ArrowDown } from './icons'
 import { drawColumn, fitCanvas, whileVisible } from './viz'
 
 const SPECS = [
-  { v: 83.6, d: 1, unit: '%', label: 'Validation accuracy · float32' },
-  { v: 80.4, d: 1, unit: '%', label: 'Test accuracy · float32' },
+  { v: 89.58, d: 2, unit: '%', label: 'Model accuracy' },
   { v: 164, d: 0, unit: 'ms', label: 'Latency · int8 on‑device' },
   { v: 15.4, d: 1, unit: 'KB', label: 'Peak RAM · int8' },
   { v: 80, d: 0, unit: 'MHz', label: 'Benchmark MCU · Cortex‑M4F' },

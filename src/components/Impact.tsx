@@ -11,9 +11,9 @@ const MILESTONES = [
 ]
 
 const USES = [
+  { icon: Clinic, title: 'Clinics', text: 'Objective cough counts between visits, synced to the app.' },
   { icon: School, title: 'Schools & colleges', text: 'Spot cough outbreaks in classrooms early — where viruses spread fastest.' },
   { icon: Home, title: 'Homes', text: 'Remote monitoring of a patient’s condition, plus gas-leak alerts in the kitchen.' },
-  { icon: Clinic, title: 'Clinics', text: 'Objective cough counts between visits, synced to the app.' },
   { icon: Factory, title: 'Workplaces', text: 'Safer air and early warning for teams working near gas.' },
 ]
 
@@ -29,9 +29,9 @@ const fmt = (n: number) => n.toLocaleString('en-US')
 
 export function Impact() {
   const ref = useRef<HTMLElement>(null)
-  const [schools, setSchools] = useState(1000)
+  const [clinics, setClinics] = useState(1000)
   const [per, setPer] = useState(3)
-  const units = schools * per
+  const units = clinics * per
   const turnover = units * PRICE
   const bn = turnover / 1e9
 
@@ -50,26 +50,26 @@ export function Impact() {
         <h2 id="impact-title" className="h2">
           Built for Uzbekistan’s
           <br />
-          classrooms first.
+          clinics first.
         </h2>
-        <p className="lead">Affordable, locally produced and designed for schools — then homes, clinics and workplaces.</p>
+        <p className="lead">Affordable, locally produced and designed for clinics — then schools, homes and workplaces.</p>
       </div>
 
       <div className="calc">
         <div>
           <div className="range">
             <div className="range__head">
-              <label className="label" htmlFor="schools">
-                Schools
+              <label className="label" htmlFor="clinics">
+                Clinics
               </label>
-              <b>{fmt(schools)}</b>
+              <b>{fmt(clinics)}</b>
             </div>
-            <input id="schools" type="range" min={100} max={10000} step={100} value={schools} onChange={(e) => setSchools(+e.target.value)} />
+            <input id="clinics" type="range" min={100} max={10000} step={100} value={clinics} onChange={(e) => setClinics(+e.target.value)} />
           </div>
           <div className="range">
             <div className="range__head">
               <label className="label" htmlFor="per">
-                Devices per school
+                Devices per clinic
               </label>
               <b>{per}</b>
             </div>
@@ -82,7 +82,7 @@ export function Impact() {
         <div className="calc__out" aria-live="polite">
           {bn >= 1 ? bn.toFixed(bn >= 10 ? 0 : 1) : (turnover / 1e6).toFixed(0)}
           <span style={{ fontSize: '0.4em', letterSpacing: '-0.03em' }}>{bn >= 1 ? ' bn' : ' mln'} soʻm</span>
-          <small>Projected turnover · e.g. 3 units in 1,000 schools = 1.5 billion soʻm</small>
+          <small>Projected turnover · e.g. 3 units in 1,000 clinics = 1.5 billion soʻm</small>
         </div>
       </div>
 

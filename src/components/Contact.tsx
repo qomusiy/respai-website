@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Arrow, Check } from './icons'
 
-const TYPES = ['School', 'Clinic', 'Home', 'Investor', 'Other']
+const TYPES = ['Clinic', 'School', 'Home', 'Investor', 'Other']
 const TELEGRAM = 'https://t.me/MUKHAMMAD_VMD'
 
 /** Copies text synchronously (works inside the click, before a new tab steals focus). */
@@ -29,7 +29,7 @@ function copyText(text: string) {
  * copied to the clipboard and the team's Telegram chat is opened.
  */
 export function Contact() {
-  const [type, setType] = useState('School')
+  const [type, setType] = useState('Clinic')
   const [sent, setSent] = useState<{ text: string; copied: boolean } | null>(null)
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -57,9 +57,9 @@ export function Contact() {
           <h2 id="contact-title" className="h2" style={{ margin: '14px 0 22px' }}>
             Bring RespAI
             <br />
-            to your school.
+            to your clinic.
           </h2>
-          <p className="lead">We’re looking for pilot schools, clinics and partners in Uzbekistan. Tell us about your space — we’ll get back within a few days.</p>
+          <p className="lead">We’re looking for pilot clinics, schools and partners in Uzbekistan. Tell us about your space — we’ll get back within a few days.</p>
           <div className="team">
             <div className="person">
               <span className="avatar">VM</span>
@@ -113,7 +113,7 @@ export function Contact() {
             <label className="label mute" htmlFor="c-msg">
               Message
             </label>
-            <textarea id="c-msg" name="message" maxLength={2000} placeholder="How many rooms or students? What would you like RespAI to monitor?" />
+            <textarea id="c-msg" name="message" maxLength={2000} placeholder="How many rooms or patients? What would you like RespAI to monitor?" />
           </div>
           <div className="form__foot">
             <span className="label mute" aria-live="polite">

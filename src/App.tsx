@@ -14,6 +14,7 @@ import { ModelSection } from './components/ModelSection'
 import { Playground } from './components/Playground'
 import { DeviceSection } from './components/DeviceSection'
 import { Gallery } from './components/Gallery'
+import { Field } from './components/Field'
 import { Air } from './components/Air'
 import { Reminder } from './components/Reminder'
 import { Compare } from './components/Compare'
@@ -48,6 +49,7 @@ export default function App() {
         <Playground />
         <DeviceSection />
         <Gallery />
+        <Field />
         <Air />
         <Reminder />
         <Compare />
