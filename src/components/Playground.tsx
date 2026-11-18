@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { View } from '@react-three/drei'
-import { OrbScene } from '../three/scenes'
 import { getEngine, type RespEngine } from '../lib/audio/engine'
 import type { AnalysisFrame, FileAnalysis, SampleKind } from '../lib/audio/types'
 import { useApp, live } from '../lib/live'
@@ -11,12 +9,17 @@ import { drawColumn, fitCanvas } from './viz'
 import { gsap } from '../lib/scroll'
 
 const SAMPLES: Array<{ kind: SampleKind; label: string; hint: string }> = [
-  { kind: 'cough', label: 'Cough', hint: 'single' },
-  { kind: 'double-cough', label: 'Double cough', hint: 'x2' },
-  { kind: 'speech', label: 'Speech', hint: 'should ignore' },
-  { kind: 'clap', label: 'Claps', hint: 'should ignore' },
-  { kind: 'noise', label: 'Fan noise', hint: 'should ignore' },
+  { kind: 'cough', label: 'Cough', hint: '' },
+  { kind: 'double-cough', label: 'Double cough', hint: '' },
+  { kind: 'speech', label: 'Speech', hint: 'should be ignored' },
+  { kind: 'clap', label: 'Claps', hint: 'should be ignored' },
+  { kind: 'noise', label: 'Fan noise', hint: 'should be ignored' },
 ]
+
+/** A muted or disconnected input delivers exact zeros (≈ −120 dBFS); a real room never drops below ≈ −95. */
+const SILENT_DB = -105
+const SILENT_CHECK_MS = 2500
+const SILENCE = new Float32Array(40)
 
 const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
@@ -35,7 +38,10 @@ export function Playground() {
   const spectro = useRef<HTMLCanvasElement>(null)
   const oled = useRef<HTMLCanvasElement>(null)
   const stateEl = useRef<HTMLDivElement>(null)
-  const ring = useRef<SVGCircleElement>(null)
+  const levelBar = useRef<HTMLElement>(null)
+  const micPeakDb = useRef(-200)
+  const silentRef = useRef(false)
+  const [silentMic, setSilentMic] = useState(false)
   const barCough = useRef<HTMLElement>(null)
   const barNoise = useRef<HTMLElement>(null)
   const valCough = useRef<HTMLSpanElement>(null)
@@ -93,9 +99,11 @@ export function Playground() {
       for (let i = step; i > 0; i--) drawColumn(ctx, colImg.current, f.mel, c.width - i, c.height, alert)
     }
     const p = f.prob
-    if (ring.current) {
-      ring.current.style.strokeDashoffset = String(1 - p)
-      ring.current.style.stroke = p > 0.6 ? 'var(--alert)' : 'var(--cyan)'
+    if (levelBar.current) levelBar.current.style.transform = `scaleX(${f.level.toFixed(3)})`
+    if (f.db > micPeakDb.current) micPeakDb.current = f.db
+    if (silentRef.current && f.db > SILENT_DB) {
+      silentRef.current = false
+      setSilentMic(false)
     }
     if (barCough.current) barCough.current.style.transform = `scaleX(${p})`
     if (barNoise.current) barNoise.current.style.transform = `scaleX(${f.label === 'silence' ? 0 : 1 - p})`
@@ -110,7 +118,7 @@ export function Playground() {
     micBtn.current?.style.setProperty('--lvl', f.level.toFixed(3))
   }
 
-  // idle spectrogram drift so the console never looks dead
+  // with no audio flowing, keep scrolling silence so the graph only ever shows real data
   useEffect(() => {
     const c = spectro.current
     if (!c) return
@@ -122,9 +130,8 @@ export function Playground() {
       const ctx = c.getContext('2d')!
       if (!colImg.current || colImg.current.height !== c.height) colImg.current = ctx.createImageData(1, c.height)
       ctx.drawImage(c, -1, 0)
-      const vals = new Float32Array(40).map((_, i) => 0.05 + Math.random() * 0.06 * (1 - i / 50))
-      drawColumn(ctx, colImg.current, vals, c.width - 1, c.height)
-      if (ring.current) ring.current.style.strokeDashoffset = '1'
+      drawColumn(ctx, colImg.current, SILENCE, c.width - 1, c.height)
+      if (levelBar.current) levelBar.current.style.transform = 'scaleX(0)'
       if (stateEl.current && engineState !== 'listening' && engineState !== 'playing') {
         stateEl.current.textContent = 'Ready'
         stateEl.current.classList.remove('is-cough')
@@ -132,6 +139,26 @@ export function Playground() {
     }
     raf = requestAnimationFrame(idle)
     return () => cancelAnimationFrame(raf)
+  }, [engineState])
+
+  // A mic that only ever delivers digital silence is muted or unplugged at the OS level:
+  // the browser reports it as working, so say so instead of looking broken.
+  useEffect(() => {
+    if (engineState !== 'listening') {
+      silentRef.current = false
+      setSilentMic(false)
+      return
+    }
+    micPeakDb.current = -200
+    const id = setInterval(() => {
+      const silent = micPeakDb.current <= SILENT_DB
+      if (silent !== silentRef.current) {
+        silentRef.current = silent
+        setSilentMic(silent)
+      }
+      micPeakDb.current = -200
+    }, SILENT_CHECK_MS)
+    return () => clearInterval(id)
   }, [engineState])
 
   // OLED replica (same framebuffer as the 3D device)
@@ -200,18 +227,18 @@ export function Playground() {
     <section className="section section--night play" id="try" data-nav="dark" ref={ref} aria-labelledby="try-title">
       <div className="play__grid">
         <div className="play__intro">
-          <div className="label mute">03 — Try it</div>
+          <span className="eyebrow">Live demo</span>
           <h2 id="try-title" className="h2">
-            Cough.
-            <br />
-            We’ll hear it.
+            Try the detector in your browser
           </h2>
-          <p className="lead">Turn on your microphone and cough — or play a sample. Resp‑1 runs right here in your browser, in real time.</p>
+          <p className="lead" style={{ marginTop: 20 }}>
+            Turn on your microphone and cough, or play one of the sample sounds. Detection runs inside this browser tab in real time, and no audio is uploaded.
+          </p>
 
           <div style={{ marginTop: 22 }}>
-            <span className="engine-badge" title={engineInfo?.name}>
+            <span className="engine-badge" title={isEI ? engineInfo?.name : 'A lightweight detector built for this website. The device itself runs the Resp‑1 model.'}>
               <span className={`dot ${isEI ? 'dot--live' : 'dot--cyan'}`} />
-              {engineInfo ? (isEI ? 'Resp‑1 model · WebAssembly' : 'Preview engine · in-browser') : 'Loading engine…'}
+              {engineInfo ? (isEI ? 'Resp‑1 model, WebAssembly build' : 'Browser version of the detector') : 'Loading…'}
             </span>
           </div>
 
@@ -221,20 +248,39 @@ export function Playground() {
             </button>
             <div className="mic__label">
               <strong>{listening ? 'Listening…' : engineState === 'loading' ? 'Starting…' : 'Start listening'}</strong>
-              <span className="label mute">{listening ? 'Cough near your microphone' : 'Microphone · processed locally'}</span>
+              <span className="label mute">{listening ? 'Cough near your microphone' : 'Uses your microphone, processed on this device'}</span>
             </div>
           </div>
           {engineState === 'error' && engineError && (
-            <p className="label" style={{ color: 'var(--alert)', marginTop: -10, marginBottom: 18 }}>
-              {/denied|permission|notallowed/i.test(engineError) ? 'Microphone access was blocked — allow it in your browser settings, or try a sample below.' : engineError}
+            <p className="mic-warning" role="alert">
+              {/denied/i.test(engineError) ? (
+                <>
+                  <b>Microphone access was blocked.</b> Allow it for this site in your browser settings, or play a sample below.
+                </>
+              ) : /HTTPS/i.test(engineError) ? (
+                <>
+                  <b>The microphone needs a secure connection.</b> Open the site over https:// (or on localhost). The samples below still work.
+                </>
+              ) : /found/i.test(engineError) ? (
+                <>
+                  <b>No microphone was found.</b> Connect one, or check that your system detects it, then try again.
+                </>
+              ) : (
+                engineError
+              )}
+            </p>
+          )}
+          {silentMic && (
+            <p className="mic-warning" role="alert">
+              <b>No sound is reaching the page.</b> Your microphone is on but only sending silence. It is most likely muted in your computer&rsquo;s sound settings (or with a mic-mute key), or a different input device is selected.
             </p>
           )}
 
-          <div className="label mute">No mic? Play a sample</div>
+          <div className="label mute">Or play a sample sound</div>
           <div className="samples">
             {SAMPLES.map((s) => (
               <button key={s.kind} className={`sample ${playing === s.kind ? 'is-playing' : ''}`} onClick={() => play(s.kind)} disabled={!engine}>
-                <Play /> {s.label} <em>{s.hint}</em>
+                <Play /> {s.label} {s.hint && <em>{s.hint}</em>}
               </button>
             ))}
           </div>
@@ -273,38 +319,35 @@ export function Playground() {
           <div className="console__top">
             <span className="label">
               <span className="dot dot--live" style={{ marginRight: 8, verticalAlign: '1px', opacity: listening ? 1 : 0.3 }} />
-              Resp‑1 console
+              Detector output
             </span>
-            <span className="label mute">{engineInfo ? `${engineInfo.sampleRate / 1000} kHz · ${engineInfo.windowMs} ms window` : '—'}</span>
+            <span className="label mute">{engineInfo ? `${engineInfo.sampleRate / 1000} kHz · ${engineInfo.windowMs} ms window` : ''}</span>
           </div>
 
           <div className="console__stage">
-            <View className="view" index={3}>
-              <OrbScene scale={0.82} z={5.6} />
-            </View>
-            <svg className="console__ring" viewBox="0 0 100 100" aria-hidden>
-              <circle cx="50" cy="50" r="48" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="0.6" />
-              <circle ref={ring} cx="50" cy="50" r="48" fill="none" stroke="var(--cyan)" strokeWidth="1.2" strokeLinecap="round" pathLength={1} strokeDasharray="1" strokeDashoffset="1" transform="rotate(-90 50 50)" style={{ transition: 'stroke-dashoffset .12s linear, stroke .3s' }} />
-            </svg>
-            <div className="console__oled" aria-label="Device screen replica">
-              <canvas ref={oled} width={128} height={64} />
-              <span className="label mute">What RespAI’s screen shows</span>
-            </div>
-            <div className="console__status">
-              <div>
-                <div className="label mute" style={{ marginBottom: 6 }}>
-                  Status
-                </div>
-                <div ref={stateEl} className="console__state" aria-live="polite">
-                  Ready
-                </div>
+            <div>
+              <div className="label mute">Status</div>
+              <div ref={stateEl} className="console__state" aria-live="polite">
+                Ready
+              </div>
+              <div className="level">
+                <span className="label mute">Input level</span>
+                <span className="level__bar">
+                  <i ref={levelBar} />
+                </span>
               </div>
             </div>
+            <figure className="console__oled">
+              <div className="bezel">
+                <canvas ref={oled} width={128} height={64} aria-label="Replica of the device screen" />
+              </div>
+              <figcaption className="label mute">Same view as the device screen</figcaption>
+            </figure>
           </div>
 
           <div className="spectro">
             <canvas ref={spectro} />
-            <span className="label mute">Mel spectrogram · live</span>
+            <span className="label mute">Mel spectrogram, live</span>
             <div className="spectro__axis">
               <span>8k</span>
               <span>2k</span>

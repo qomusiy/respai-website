@@ -15,7 +15,7 @@ export function Footer() {
             <Mark /> RespAI
           </span>
           <p className="mute" style={{ maxWidth: '36ch', marginTop: 14, color: 'var(--on-night-mute)' }}>
-            A smart cough detector with an air-quality monitor. Developed by team Laputa in Uzbekistan.
+            A cough detector and air-quality monitor, built by Invenio in Uzbekistan.
           </p>
         </div>
         <div>
@@ -25,17 +25,17 @@ export function Footer() {
           <ul>
             <li>
               <a href="#model" onClick={go('model')}>
-                Resp‑1 model
+                How it works
               </a>
             </li>
             <li>
               <a href="#try" onClick={go('try')}>
-                Try it live
+                Live demo
               </a>
             </li>
             <li>
               <a href="#device" onClick={go('device')}>
-                Device
+                Hardware
               </a>
             </li>
             <li>
@@ -47,12 +47,17 @@ export function Footer() {
         </div>
         <div>
           <span className="label" style={{ color: 'var(--on-night-mute)' }}>
-            Team
+            Company
           </span>
           <ul>
             <li>
+              <a href="#team" onClick={go('team')}>
+                Team
+              </a>
+            </li>
+            <li>
               <a href="#impact" onClick={go('impact')}>
-                Impact
+                Market
               </a>
             </li>
             <li>
@@ -74,11 +79,8 @@ export function Footer() {
           <p style={{ fontSize: 13, color: 'var(--on-night-mute)', marginTop: 14 }}>RespAI is a research prototype, not a medical device. It does not diagnose disease. If a cough persists, see a doctor.</p>
         </div>
       </div>
-      <div className="footer__word" aria-hidden>
-        RespAI
-      </div>
       <div className="footer__legal label" style={{ color: 'var(--on-night-mute)' }}>
-        <span>© {new Date().getFullYear()} Laputa · All rights reserved</span>
+        <span>© {new Date().getFullYear()} Invenio</span>
         <span lang="uz">Har bir nafas muhim</span>
       </div>
     </footer>

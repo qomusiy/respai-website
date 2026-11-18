@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/scroll'
-import { Arrow, Clinic, Factory, Home, School } from './icons'
+import { Clinic, Factory, Home, School } from './icons'
 
 const PRICE = 500_000 // soʻm per unit
 
@@ -12,17 +12,9 @@ const MILESTONES = [
 
 const USES = [
   { icon: Clinic, title: 'Clinics', text: 'Objective cough counts between visits, synced to the app.' },
-  { icon: School, title: 'Schools & colleges', text: 'Spot cough outbreaks in classrooms early — where viruses spread fastest.' },
+  { icon: School, title: 'Schools & colleges', text: 'Spot a rise in coughing early, in the rooms where viruses spread fastest.' },
   { icon: Home, title: 'Homes', text: 'Remote monitoring of a patient’s condition, plus gas-leak alerts in the kitchen.' },
   { icon: Factory, title: 'Workplaces', text: 'Safer air and early warning for teams working near gas.' },
-]
-
-const PRINCIPLES: Array<[string, string]> = [
-  ['Medical precision', 'AI model & sound analysis'],
-  ['Technical reliability', 'ESP32 hardware system'],
-  ['Marketability', 'Affordable, local production'],
-  ['Privacy & ethics', 'Consent window & data encryption'],
-  ['User experience', 'Mobile app & interface for Uzbekistan'],
 ]
 
 const fmt = (n: number) => n.toLocaleString('en-US')
@@ -38,7 +30,6 @@ export function Impact() {
   useEffect(() => {
     const ctx = gsap.context(() => {
       gsap.from('.use', { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: '.uses', start: 'top 85%' } })
-      gsap.from('.principle', { x: -30, opacity: 0, duration: 1, ease: 'expo.out', stagger: 0.06, scrollTrigger: { trigger: '.principles', start: 'top 80%' } })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -46,13 +37,11 @@ export function Impact() {
   return (
     <section className="section impact above" id="impact" ref={ref} aria-labelledby="impact-title">
       <div className="section-head">
-        <div className="label">08 — Impact</div>
+        <span className="eyebrow">Market</span>
         <h2 id="impact-title" className="h2">
-          Built for Uzbekistan’s
-          <br />
-          clinics first.
+          Starting with clinics in Uzbekistan
         </h2>
-        <p className="lead">Affordable, locally produced and designed for clinics — then schools, homes and workplaces.</p>
+        <p className="lead">Affordable and produced locally. We start with clinics, then move to schools, homes and workplaces.</p>
       </div>
 
       <div className="calc">
@@ -107,20 +96,6 @@ export function Impact() {
               <p className="mute">{text}</p>
             </div>
           </article>
-        ))}
-      </div>
-
-      <div className="principles">
-        <div className="section-head" style={{ marginBottom: 32 }}>
-          <div className="label">Design principles · axiomatic design</div>
-        </div>
-        {PRINCIPLES.map(([fr, dp], i) => (
-          <div className="principle" key={fr}>
-            <span className="label mute">FR{i + 1}</span>
-            <span>{fr}</span>
-            <Arrow />
-            <span className="mute">{dp}</span>
-          </div>
         ))}
       </div>
     </section>

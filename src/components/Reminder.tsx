@@ -96,12 +96,11 @@ export function Reminder() {
     <section className="section" id="reminder" ref={ref} aria-labelledby="reminder-title">
       <div className="reminder__grid">
         <div className="reminder__copy above">
-          <div className="label">06 — Medication reminder</div>
-          <h2 id="reminder-title" className="h2" style={{ margin: '14px 0 22px' }}>
-            Never miss
-            <br />a dose.
+          <span className="eyebrow">Medication reminders</span>
+          <h2 id="reminder-title" className="h2" style={{ margin: '0 0 22px' }}>
+            Reminders on the device, not just the phone
           </h2>
-          <p className="lead">Taking medicine late can reduce its effectiveness and delay recovery. Schedule doses in the app — RespAI beeps and shows the reminder on its screen.</p>
+          <p className="lead">Taking medicine late can make it less effective and slow down recovery. Doses scheduled in the app make RespAI beep and show the reminder on its screen. Try it below.</p>
           <div className="reminder__form">
             <div className="field">
               <label className="label mute" htmlFor="med">

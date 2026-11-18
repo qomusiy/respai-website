@@ -1,24 +1,22 @@
 import { useEffect, useRef } from 'react'
-import { View } from '@react-three/drei'
-import { OrbScene } from '../three/scenes'
-import { gsap, ScrollTrigger, scrollToId } from '../lib/scroll'
+import { ScrollTrigger, scrollToId } from '../lib/scroll'
 import { ArrowDown } from './icons'
 import { drawColumn, fitCanvas, whileVisible } from './viz'
 
 const SPECS = [
-  { v: 89.58, d: 2, unit: '%', label: 'Model accuracy' },
-  { v: 164, d: 0, unit: 'ms', label: 'Latency · int8 on‑device' },
-  { v: 15.4, d: 1, unit: 'KB', label: 'Peak RAM · int8' },
-  { v: 80, d: 0, unit: 'MHz', label: 'Benchmark MCU · Cortex‑M4F' },
-  { v: 0, d: 0, unit: 'bytes', label: 'Audio sent to the cloud' },
+  { v: '89.58', unit: '%', label: 'Accuracy' },
+  { v: '164', unit: 'ms', label: 'Inference time, int8' },
+  { v: '15.4', unit: 'KB', label: 'Peak RAM, int8' },
+  { v: '80', unit: 'MHz', label: 'Benchmark chip, Cortex‑M4F' },
+  { v: '0', unit: 'bytes', label: 'Audio uploaded' },
 ]
 
 const STEPS = [
-  { t: 'Listen', p: 'A digital microphone on the device hears the room continuously.' },
-  { t: 'Waveform', p: 'Audio is cut into short, overlapping windows of sound.' },
-  { t: 'Spectrogram', p: 'Each window becomes a mel spectrogram — a picture of the sound’s energy.' },
-  { t: 'Neural network', p: 'A compact, int8-quantised network scores the picture.' },
-  { t: 'Decision', p: 'Cough or noise. Coughs are counted, logged and synced to the app.' },
+  { t: 'Listen', p: 'A digital microphone on the device picks up sound in the room.' },
+  { t: 'Window', p: 'The audio is cut into short, overlapping windows.' },
+  { t: 'Spectrogram', p: 'Each window is turned into a mel spectrogram, a picture of how the sound energy is spread across frequencies.' },
+  { t: 'Classify', p: 'A compact 8-bit neural network scores the spectrogram.' },
+  { t: 'Count', p: 'Coughs are counted and logged on the device, then synced to the app.' },
 ]
 
 // ——— small looping visualisations for each pipeline step ———
@@ -159,23 +157,6 @@ export function ModelSection() {
   const pipe = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const ctx = gsap.context(() => {
-      // count-up specs
-      ref.current?.querySelectorAll<HTMLElement>('[data-count]')?.forEach((el) => {
-        const to = parseFloat(el.dataset.count || '0')
-        const d = parseInt(el.dataset.dec || '0')
-        const o = { v: 0 }
-        gsap.to(o, {
-          v: to,
-          duration: 1.8,
-          ease: 'expo.out',
-          scrollTrigger: { trigger: el, start: 'top 90%' },
-          onUpdate: () => (el.firstChild!.textContent = o.v.toFixed(d)),
-        })
-      })
-      gsap.from('.model__corner', { opacity: 0, y: 20, duration: 1.2, ease: 'expo.out', stagger: 0.08, scrollTrigger: { trigger: '.model__stage', start: 'top 70%' } })
-    }, ref)
-
     const steps = pipe.current ? Array.from(pipe.current.querySelectorAll('.step')) : []
     const st = ScrollTrigger.create({
       trigger: pipe.current,
@@ -186,58 +167,25 @@ export function ModelSection() {
         steps.forEach((el, i) => el.classList.toggle('is-on', s.progress >= i / steps.length - 0.02))
       },
     })
-    return () => {
-      ctx.revert()
-      st.kill()
-    }
+    return () => st.kill()
   }, [])
 
   return (
     <section className="section section--night model" id="model" data-nav="dark" ref={ref} aria-labelledby="model-title">
       <div className="section-head">
-        <div className="label">02 — The model</div>
-      </div>
-
-      <div className="model__stage">
-        <div className="model__glow" />
-        <div className="model__name" aria-hidden>
-          Resp‑1
-        </div>
-        <View className="view" index={2}>
-          <OrbScene scale={1.05} z={5.4} mobileY={-0.55} />
-        </View>
-        <div className="model__corner model__corner--tl">
-          <span className="chip">
-            <span className="dot dot--cyan" /> Model · v1
-          </span>
-          <h2 id="model-title" className="model__title">
-            Meet Resp‑1.
-          </h2>
-          <p className="lead">A tiny neural network that recognises coughs — small enough to run on a low-cost microcontroller, fully offline.</p>
-        </div>
-        <div className="model__corner model__corner--tr label mute">
-          Trained on labelled cough & noise recordings
-          <br />
-          Edge Impulse · quantised int8
-        </div>
-        <div className="model__corner model__corner--bl">
-          <button className="btn btn--night" onClick={() => scrollToId('try')}>
-            Try it live <ArrowDown />
-          </button>
-        </div>
-        <div className="model__corner model__corner--br label mute">
-          Audio in → cough / noise out
-          <br />
-          Every window, every second
-        </div>
+        <span className="eyebrow">How it works</span>
+        <h2 id="model-title" className="h2">
+          A cough model small enough for a microcontroller
+        </h2>
+        <p className="lead">Resp‑1 is our cough model. We trained it in Edge Impulse on labelled cough and background-noise recordings and quantised it to 8-bit integers so it runs on the device without an internet connection.</p>
       </div>
 
       <div className="specs">
         {SPECS.map((s) => (
           <div className="spec" key={s.label}>
             <span className="label mute">{s.label}</span>
-            <div className="spec__v" data-count={s.v} data-dec={s.d}>
-              <span>0</span>
+            <div className="spec__v">
+              {s.v}
               <small>{s.unit}</small>
             </div>
           </div>
@@ -245,12 +193,9 @@ export function ModelSection() {
       </div>
 
       <div className="pipeline">
-        <div className="section-head" style={{ marginBottom: 48 }}>
-          <h3 className="h2" style={{ gridColumn: '1 / span 8' }}>
-            How Resp‑1 hears a cough.
-          </h3>
-          <p className="lead">Five steps, a few hundred milliseconds, zero bytes sent to the cloud.</p>
-        </div>
+        <h3 className="h3" style={{ marginBottom: 40 }}>
+          From sound to a cough count
+        </h3>
         <div className="pipe" ref={pipe}>
           <div className="pipe__rail">
             <i />
@@ -267,6 +212,12 @@ export function ModelSection() {
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="model__cta">
+        <button className="btn btn--night" onClick={() => scrollToId('try')}>
+          Try it in your browser <ArrowDown />
+        </button>
       </div>
     </section>
   )

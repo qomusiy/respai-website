@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useProgress } from '@react-three/drei'
 import { lenis } from '../lib/scroll'
-
-const LINES = ['Loading Resp‑1 neural network', 'Calibrating microphone', 'Warming up the MQ‑6 sensor', 'Booting OLED display']
+import { Mark } from './icons'
 
 export function Loader() {
   const { progress, active } = useProgress()
@@ -23,8 +22,8 @@ export function Loader() {
       const dt = Math.min(0.25, (now - last) / 1000)
       last = now
       const elapsed = now - start.current
-      // never faster than ~1.3 s, never slower than 7 s
-      const cap = Math.min(100, (elapsed / 1300) * 100)
+      // never slower than 7 s; no artificial minimum
+      const cap = 100
       const goal = elapsed > 7000 ? 100 : Math.min(cap, target.current)
       v += (goal - v) * (1 - Math.exp(-dt * 9))
       if (goal - v < 0.6) v = goal
@@ -45,19 +44,13 @@ export function Loader() {
   }, [])
 
   return (
-    <div className={`loader ${done ? 'is-done' : ''}`} aria-hidden={done} role="status">
-      <div className="label" style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <span>RespAI · by Laputa</span>
-        <span>{LINES[Math.min(LINES.length - 1, Math.floor(shown / 26))]}…</span>
-      </div>
-      <div>
-        <div className="loader__num">{String(shown).padStart(3, '0')}</div>
+    <div className={`loader ${done ? 'is-done' : ''}`} aria-hidden={done} role="status" aria-label="Loading">
+      <div className="loader__inner">
+        <span className="logo">
+          <Mark /> RespAI
+        </span>
         <div className="loader__bar" style={{ ['--p' as string]: shown / 100 }}>
           <i />
-        </div>
-        <div className="loader__row label">
-          <span>Har bir nafas muhim</span>
-          <span>Every breath matters</span>
         </div>
       </div>
     </div>

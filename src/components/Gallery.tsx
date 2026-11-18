@@ -29,38 +29,26 @@ export function Gallery() {
   return (
     <section className="section gallery above" ref={ref} aria-labelledby="gallery-title">
       <div className="section-head">
-        <div className="label">Working prototype</div>
+        <span className="eyebrow">Prototype</span>
         <h2 id="gallery-title" className="h2">
-          Real hardware.
-          <br />
-          Real coughs.
+          The working prototype
         </h2>
-        <p className="lead">Not a render. The working RespAI prototype — the OLED showing a live detection, probability 0.84.</p>
+        <p className="lead">Photos of the current RespAI unit. The screen is showing real detections: the word “cough”, its probability and the running count.</p>
       </div>
       <div className="gallery__row">
         <figure className="shot shot--a" style={{ margin: 0 }}>
           <Img name="device-front" alt="The RespAI prototype on a desk, OLED screen showing a cough detected with probability 0.84" sizes="(max-width: 800px) 100vw, 45vw" />
-          <figcaption className="shot__cap">
-            <span className="chip">p = 0.84</span>
-            <span className="chip">cough · C:1</span>
-          </figcaption>
         </figure>
         <figure className="shot shot--b" style={{ margin: 0 }}>
           <Img name="device-closeup" alt="Close-up of the RespAI device with its embossed logo and MQ-6 gas sensor" sizes="(max-width: 800px) 50vw, 33vw" />
-          <figcaption className="shot__cap">
-            <span className="chip">MQ‑6 gas sensor</span>
-          </figcaption>
         </figure>
         <figure className="shot shot--c" style={{ margin: 0 }}>
           <Img name="oled-closeup" alt="The device OLED: WiFi OK, Firebase OK, p=0.84 cough, temperature 26.8°C, humidity 35%" sizes="(max-width: 800px) 50vw, 25vw" widths={[700, 1200]} />
-          <figcaption className="shot__cap">
-            <span className="chip">WiFi:OK · FB:OK</span>
-          </figcaption>
         </figure>
       </div>
       <div className="gallery__caption label mute">
-        <span>3D-printed PLA enclosure · ESP32 · 0.96″ OLED</span>
-        <span>Tested in Uzbekistan</span>
+        <span>3D-printed PLA case, ESP32, 0.96″ OLED, MQ‑6 gas sensor</span>
+        <span>Tashkent, 2026</span>
       </div>
     </section>
   )

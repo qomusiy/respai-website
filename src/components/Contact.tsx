@@ -53,30 +53,23 @@ export function Contact() {
     <section className="section above" id="contact" aria-labelledby="contact-title">
       <div className="contact__grid">
         <div>
-          <div className="label">09 — Contact</div>
-          <h2 id="contact-title" className="h2" style={{ margin: '14px 0 22px' }}>
-            Bring RespAI
-            <br />
-            to your clinic.
+          <span className="eyebrow">Contact</span>
+          <h2 id="contact-title" className="h2" style={{ margin: '0 0 22px' }}>
+            Run a pilot with us
           </h2>
-          <p className="lead">We’re looking for pilot clinics, schools and partners in Uzbekistan. Tell us about your space — we’ll get back within a few days.</p>
+          <p className="lead">We are looking for pilot clinics, schools and partners in Uzbekistan. Tell us about your space and we will reply within a few days.</p>
           <div className="team">
             <div className="person">
               <span className="avatar">VM</span>
               <span>
                 <b style={{ fontWeight: 500 }}>Valiyev Muhammadjon</b>
                 <br />
-                <span className="label mute">Project manager · Team Laputa</span>
+                <span className="label mute">Project manager, Invenio</span>
               </span>
               <a className="btn btn--sm" href={TELEGRAM} target="_blank" rel="noreferrer">
                 Telegram <Arrow />
               </a>
             </div>
-            <p className="label mute" style={{ marginTop: 8, lineHeight: 1.6 }}>
-              Shaped by live interviews and feedback sessions.
-              <br />
-              Developed by team Laputa, Uzbekistan.
-            </p>
           </div>
         </div>
 
@@ -119,7 +112,7 @@ export function Contact() {
             <span className="label mute" aria-live="polite">
               {sent ? (
                 <span style={{ color: 'var(--good)', display: 'inline-flex', gap: 6, alignItems: 'center' }}>
-                  <Check width={14} height={14} /> {sent.copied ? 'Message copied — paste it into the Telegram chat.' : 'Copy the message below into the Telegram chat.'}
+                  <Check width={14} height={14} /> {sent.copied ? 'Message copied. Paste it into the Telegram chat.' : 'Copy the message below into the Telegram chat.'}
                 </span>
               ) : (
                 'Opens Telegram with your message ready to paste.'

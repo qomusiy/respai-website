@@ -70,13 +70,11 @@ export function Air() {
   return (
     <section className="section air" id="air" ref={ref} aria-labelledby="air-title">
       <div className="section-head above">
-        <div className="label">05 — Air quality</div>
+        <span className="eyebrow">Air quality</span>
         <h2 id="air-title" className="h2">
-          Air you can
-          <br />
-          finally see.
+          Air quality readings from the same device
         </h2>
-        <p className="lead">The same device that hears coughs reads the room — and warns you when the air turns dangerous.</p>
+        <p className="lead">The same device measures temperature, humidity and flammable gas in the room, and warns you when the readings become unsafe.</p>
       </div>
 
       <div className="air__grid above">
@@ -115,7 +113,7 @@ export function Air() {
               <div className="tile__head">
                 <span className="label">MQ‑6 gas sensor</span>
                 <span className="chip" style={{ background: gasAlert ? 'var(--alert)' : undefined, color: gasAlert ? '#fff' : undefined }}>
-                  {gasAlert ? 'Gas level rising — ventilate' : 'Safe'}
+                  {gasAlert ? 'Gas level rising, ventilate the room' : 'Safe'}
                 </span>
               </div>
               <div className="gases">

@@ -6,7 +6,7 @@ import { gsap, ScrollTrigger, useScrollProgress } from '../lib/scroll'
 const SPECS: Array<[string, string]> = [
   ['Size', '100 × 100 × 15 mm'],
   ['Brain', 'ESP32 · Wi‑Fi'],
-  ['AI', 'Resp‑1, on-device'],
+  ['Model', 'Resp‑1, runs on the device'],
   ['Display', '0.96″ OLED, 128 × 64'],
   ['Listening', 'Digital microphone'],
   ['Air', 'MQ‑6 gas · temp · humidity'],
@@ -48,13 +48,11 @@ export function DeviceSection() {
       <section className="section device" id="device" ref={ref} aria-labelledby="device-title">
         <div className="device__sticky">
           <div className="device__copy">
-            <div className="label">04 — The device</div>
+            <span className="eyebrow">Hardware</span>
             <h2 id="device-title" className="h2">
-              Inside
-              <br />
-              RespAI.
+              What is inside
             </h2>
-            <p className="lead">Eight parts, one job: hear the cough, read the air, and tell you what matters. Scroll to take it apart.</p>
+            <p className="lead">Eight parts in a 3D-printed case, from the ESP32 board to the gas sensor. Scroll to take it apart.</p>
           </div>
           <View className="view" index={4}>
             <ExplodedScene progress={progress} labelEls={labels} />

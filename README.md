@@ -1,6 +1,6 @@
 # RespAI — website
 
-Marketing site and live demo for **RespAI**, the smart cough detector with an air-quality monitor by team **Laputa**.
+Marketing site and live demo for **RespAI**, the smart cough detector with an air-quality monitor by team **Invenio**.
 
 It is a **static site**: no backend and no paid server. Everything, including cough detection, runs in the visitor's browser.
 
@@ -70,7 +70,7 @@ That node must allow public **read** in your database rules (for example `".read
 src/
   App.tsx              page layout + one shared WebGL canvas
   components/          page sections (Hero, ModelSection, Playground, DeviceSection, Air, …)
-  three/               3D device, OLED screen, AI orb, scenes
+  three/               3D device, OLED screen, scenes
   lib/audio/           cough engine: mic capture, DSP, detector + neural net, Edge Impulse adapter, test sounds
   lib/telemetry.ts     air-quality feed (simulation / Firebase)
 public/

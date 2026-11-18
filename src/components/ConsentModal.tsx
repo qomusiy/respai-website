@@ -56,7 +56,7 @@ export function ConsentModal() {
           <li>
             <Check />
             <span>
-              Audio is analysed <b>locally in your browser</b> — nothing is uploaded.
+              Audio is analysed <b>locally in your browser</b>. Nothing is uploaded.
             </span>
           </li>
           <li>
