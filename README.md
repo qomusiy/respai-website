@@ -42,6 +42,7 @@ npm run preview    # serves dist/ at http://localhost:4173
 | Cough detection ("Try it") | In the browser: microphone → spectrogram → small neural network. Audio never leaves the device. |
 | Air-quality panel | Shows a realistic **simulated** feed by default. Optionally reads your device's Firebase node directly (below). |
 | Pilot-request form | Copies the message and opens Telegram (@MUKHAMMAD_VMD). |
+| AI cough analysis (`/dashboard/`, beta) | Sends the recording to the team's analysis server (`../ai-server`: Google HeAR + classifiers), which runs on the team laptop behind a free Cloudflare tunnel. Its current address is looked up in a GitHub gist. When the laptop is off, the dashboard shows "server offline"; everything else keeps working. |
 
 ## Use your trained Edge Impulse model (recommended)
 

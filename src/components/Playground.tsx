@@ -4,7 +4,8 @@ import type { AnalysisFrame, FileAnalysis, SampleKind } from '../lib/audio/types
 import { useApp, live } from '../lib/live'
 import { oledCanvas, onOledDraw } from '../three/oled'
 import { requestConsent } from './ConsentModal'
-import { Mic, Play, Shield, Stop, Upload } from './icons'
+import { Arrow, Mic, Play, Shield, Stop, Upload } from './icons'
+import { DASHBOARD } from './Nav'
 import { drawColumn, fitCanvas } from './viz'
 import { gsap } from '../lib/scroll'
 import { getT, useLang, useT } from '../i18n'
@@ -298,6 +299,15 @@ export function Playground() {
           <p className="privacy-note">
             <Shield /> {t.privacy}
           </p>
+
+          <a className="ai-callout" href={DASHBOARD}>
+            <span className="nav__beta">{T.dash.beta}</span>
+            <span>
+              <b>{T.dash.title}</b>
+              <span className="mute">{T.dash.lead}</span>
+            </span>
+            <Arrow />
+          </a>
         </div>
 
         <div className="console">

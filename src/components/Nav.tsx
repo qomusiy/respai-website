@@ -4,6 +4,7 @@ import { scrollToId, lenis } from '../lib/scroll'
 import { LANGS, useLang, useT } from '../i18n'
 
 const NAV_IDS = ['model', 'try', 'device', 'air', 'team'] as const
+export const DASHBOARD = `${import.meta.env.BASE_URL}dashboard/`
 
 /** EN / UZ / RU switcher */
 export function LangSwitch({ className = '' }: { className?: string }) {
@@ -86,6 +87,9 @@ export function Nav() {
         </nav>
         <div className="nav__right">
           <LangSwitch />
+          <a href={DASHBOARD} className={`btn btn--sm nav__cta nav__ai ${dark ? 'btn--night' : 'btn--ghost'}`}>
+            {t.navAnalysis} <span className="nav__beta">{t.dash.beta}</span>
+          </a>
           <a href="#contact" className={`btn btn--sm nav__cta ${dark ? 'btn--night' : 'btn--dark'}`} onClick={go('contact')}>
             {t.nav.cta} <Arrow />
           </a>
@@ -102,6 +106,9 @@ export function Nav() {
               {l.label}
             </a>
           ))}
+          <a href={DASHBOARD} tabIndex={open ? 0 : -1}>
+            {t.navAnalysis} <span className="nav__beta">{t.dash.beta}</span>
+          </a>
         </nav>
         <div className="label" style={{ opacity: 0.6 }}>
           {t.nav.menuFoot}
