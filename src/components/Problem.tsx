@@ -11,6 +11,16 @@ export function Problem() {
         </h2>
         <p className="lead">{t.lead}</p>
       </div>
+      <ol className="points">
+        {t.points.map((pt, i) => (
+          <li key={i}>
+            <span className="points__n">0{i + 1}</span>
+            <h3>{pt.t}</h3>
+            <p>{pt.p}</p>
+          </li>
+        ))}
+      </ol>
+      <span className="eyebrow">{t.context}</span>
       <div className="stats">
         {t.stats.map((s) => (
           <div className="stat" key={s.n}>

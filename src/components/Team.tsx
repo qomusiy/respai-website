@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Img } from './Gallery'
+import { Img } from './Img'
 import { useT } from '../i18n'
 
 /**

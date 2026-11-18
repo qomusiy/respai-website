@@ -12,7 +12,6 @@ import { Problem } from './components/Problem'
 import { ModelSection } from './components/ModelSection'
 import { Playground } from './components/Playground'
 import { DeviceSection } from './components/DeviceSection'
-import { Gallery } from './components/Gallery'
 import { Team } from './components/Team'
 import { Air } from './components/Air'
 import { Reminder } from './components/Reminder'
@@ -70,7 +69,6 @@ export default function App() {
         <ModelSection />
         <Playground />
         <DeviceSection />
-        <Gallery />
         <Air />
         <Reminder />
         <Compare />

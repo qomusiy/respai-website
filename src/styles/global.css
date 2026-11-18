@@ -1511,14 +1511,14 @@ a {
 
 .specsheet {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   border-top: 1px solid var(--line);
 }
 .specsheet > div {
   padding: 22px 20px 26px 0;
   border-bottom: 1px solid var(--line);
 }
-.specsheet > div:not(:nth-child(4n + 1)) {
+.specsheet > div:not(:nth-child(3n + 1)) {
   padding-left: 20px;
   border-left: 1px solid var(--line);
 }
@@ -1541,64 +1541,6 @@ a {
   .specsheet > div:nth-child(2n) {
     padding-left: 20px !important;
     border-left: 1px solid var(--line) !important;
-  }
-}
-
-/* ———————————— gallery ———————————— */
-.gallery {
-  padding-top: 0;
-}
-.gallery__row {
-  display: grid;
-  grid-template-columns: 1.25fr 1fr 0.8fr;
-  gap: 14px;
-  align-items: end;
-}
-.shot {
-  position: relative;
-  overflow: hidden;
-  border-radius: 2px;
-  background: var(--bg-2);
-}
-.shot img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(1.12);
-  will-change: transform;
-}
-.shot--a {
-  aspect-ratio: 4 / 3;
-}
-.shot--b {
-  aspect-ratio: 1 / 1;
-}
-.shot--c {
-  aspect-ratio: 3 / 2;
-}
-.shot__cap {
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-.shot__cap .chip {
-  background: rgba(255, 255, 255, 0.82);
-}
-.gallery__caption {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: 18px;
-}
-@media (max-width: 800px) {
-  .gallery__row {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-  .shot--a {
-    grid-column: 1 / -1;
   }
 }
 
@@ -2078,6 +2020,67 @@ a {
 }
 .no {
   color: var(--mute);
+}
+.yes small,
+.no small {
+  font-size: 13px;
+  color: var(--mute);
+}
+.ctable__wrap {
+  overflow-x: auto;
+}
+.ctable--3 td:not(:first-child),
+.ctable--3 th:not(:first-child) {
+  width: 19%;
+}
+.ctable--3 td:first-child {
+  font-size: clamp(16px, 1.35vw, 19px);
+}
+@media (max-width: 760px) {
+  .ctable--3 {
+    min-width: 640px;
+  }
+}
+
+/* problem: the two numbered points from the pitch */
+.points {
+  list-style: none;
+  margin: 0 0 clamp(56px, 7vw, 96px);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.points li {
+  padding: 26px 28px 30px;
+  border-radius: 12px;
+  background: var(--paper);
+}
+.points__n {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--mute);
+}
+.points h3 {
+  font-size: clamp(22px, 2vw, 28px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin: 14px 0 10px;
+}
+.points p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.5;
+  max-width: 44ch;
+}
+.problem > .eyebrow {
+  margin-bottom: 14px;
+}
+@media (max-width: 760px) {
+  .points {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 /* ———————————— impact ———————————— */
