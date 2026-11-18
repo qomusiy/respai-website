@@ -2,7 +2,8 @@ import type { Dict } from './en'
 
 /** Oʻzbekcha (lotin yozuvi). */
 export const uz: Dict = {
-  locale: 'uz-Latn-UZ',
+  // Uzbek writes numbers like Russian (8 912; 14,785), and some browsers lack Uzbek number data
+  locale: 'ru-RU',
   meta: {
     title: 'RespAI — Invenio jamoasining yoʻtal detektori va havo sifati monitori',
     description:
@@ -198,34 +199,55 @@ export const uz: Dict = {
     capability: 'Xususiyat',
     rows: [
       { name: 'Qurilmadagi AI yoʻtal tahlili (ovoz yozilmaydi, maxfiylik saqlanadi)', us: { ok: true, note: 'qurilmaning oʻzida' }, hyfe: { ok: true, note: '' }, nuvo: { ok: false, note: '' } },
-      { name: 'Xona havosi va kislorod nazorati (VOC, gaz, O₂%)', us: { ok: true, note: '' }, hyfe: { ok: false, note: '' }, nuvo: { ok: false, note: '' } },
+      { name: 'Xona havosi, harorati va kislorod nazorati (VOC, gaz, O₂%)', us: { ok: true, note: '' }, hyfe: { ok: false, note: '' }, nuvo: { ok: false, note: '' } },
       { name: 'Uzluksiz EKG (AD8232) va passiv palata monitoringi', us: { ok: true, note: '' }, hyfe: { ok: false, note: '' }, nuvo: { ok: false, note: 'faol puflash talab etadi' } },
       { name: 'Narxi va mahalliy klinikalarga moslashuvchanligi', us: { ok: true, note: '$99 + oyiga $30' }, hyfe: { ok: true, note: 'ilova bepul, qurilmasi yoʻq' }, nuvo: { ok: false, note: 'qimmat, AQSh va Yevropa bozori uchun' } },
     ],
   },
   impact: {
     eyebrow: 'Bozor',
-    title: 'Oʻzbekiston klinikalaridan boshlaymiz',
-    lead: 'Hamyonbop va mahalliy ishlab chiqarilgan qurilma. Avval klinikalar, keyin maktablar, uylar va ish joylari.',
-    clinics: 'Klinikalar',
-    perClinic: 'Har bir klinikaga qurilma',
+    title: 'Bozor va biznes modeli',
+    lead: 'Boshlangʻich segmentimiz — Oʻzbekiston tibbiyot muassasalari, har biriga kamida 3 tadan qurilma.',
+    segTitle: 'Bozor hajmi',
+    segNote: 'Boshlangʻich segment: Oʻzbekiston klinikalari, har biriga kamida 3 tadan qurilma.',
+    segments: [
+      { k: 'TAM', reach: 'Oʻzbekiston boʻylab 8 912 ta tibbiyot muassasasi', value: '14,785 mlrd soʻm' },
+      { k: 'SAM', reach: 'Umumiy bozorning 20 foizi: 1 782 ta', value: '2,956 mlrd soʻm' },
+      { k: 'SOM', reach: 'Dastlabki 1 yil ichida SAM ning 10 foizi: 178 ta', value: '295 mln soʻm' },
+    ],
+    calcTitle: 'Oʻz raqamlaringizni hisoblang',
+    clinics: 'Tibbiyot muassasalari',
+    perClinic: 'Har bir muassasaga qurilma',
     unitsLine: (units: string, price: string) => `${units} dona × ${price} soʻm`,
     currency: 'soʻm',
     bn: 'mlrd',
     mln: 'mln',
-    projected: 'Kutilayotgan aylanma · masalan, 1 000 ta klinikada 3 tadan qurilma = 1,5 mlrd soʻm',
+    projected: 'Kutilayotgan aylanma · masalan, 8 912 ta muassasaning har biriga 3 tadan qurilma = 14,785 mlrd soʻm',
     units: (n: string) => `${n} dona`,
-    milestones: [
-      { title: 'Oʻzini oqlash', text: 'Loyiha 100 ta qurilmada oʻzini oqlaydi.' },
-      { title: 'Barqaror daromad', text: '500 ta oʻrnatilgan qurilmadan barqaror tushum.' },
-      { title: 'Kengayish', text: '1 000 tadan ortiq qurilma: yangi hududlar va sohalarga chiqish.' },
+    pricing: {
+      who: 'Kim toʻlaydi?',
+      whoText: 'Klinikalar va kuzatuv markazlari',
+      price: '553 000',
+      priceUnit: 'soʻm / qurilma',
+      whyTitle: 'Nima uchun?',
+      why: ['Xona harorati va havo tarkibi maʼlumotlari tahlili', 'Bemorning yurak urishi va yoʻtal sikli haqidagi real maʼlumotlar'],
+    },
+    customersTitle: 'Potensial mijozlar',
+    customers: [
+      'Davlat poliklinikalari va oilaviy shifokorlik punktlari',
+      'Xususiy klinikalar va diagnostika markazlari',
+      'Pediatriya markazlari',
+      'Tibbiy xizmatlardan foydalanadigan aholi',
+      'Chekka hududlardagi tibbiyot muassasalari',
     ],
-    uses: [
-      { title: 'Klinikalar', text: 'Qabullar oraligʻida yoʻtallarning xolis hisobi, ilova bilan sinxronlangan holda.' },
-      { title: 'Maktab va kollejlar', text: 'Viruslar eng tez tarqaladigan xonalarda yoʻtal koʻpayishini erta payqash.' },
-      { title: 'Uylar', text: 'Bemor holatini masofadan kuzatish va oshxonada gaz sizib chiqsa, ogohlantirish.' },
-      { title: 'Ish joylari', text: 'Gaz yaqinida ishlaydigan jamoalar uchun xavfsiz havo va erta ogohlantirish.' },
+    roadmapTitle: 'Maqsadlar va KPI',
+    roadmap: [
+      { when: 'Hozir', a: 'Prototip va veb-demo', b: '89,58% model testi' },
+      { when: '6 oy', a: '100 ta qurilma', b: '90%+ aniqlik maqsadi' },
+      { when: '1 yil', a: '500 ta qurilma', b: '250 mln soʻm tushum' },
+      { when: '2 yil', a: '1 000+ qurilma', b: 'Yangi hududlar' },
     ],
+    roadmapNote: 'Kelgusi raqamlar — maqsad. Tushum har bir qurilma 500 ming soʻm narxda hisoblangan.',
   },
   team: {
     eyebrow: 'Jamoa',
@@ -233,6 +255,13 @@ export const uz: Dict = {
     lead: 'Biz Oʻzbekistondan besh kishimiz va RespAI qurilmasini toʻliq oʻzimiz yaratamiz: elektronika va korpus, yoʻtalni aniqlash modeli hamda mobil ilova.',
     alt: 'Invenio jamoasining besh aʼzosi Toshkentdagi Milliy sunʼiy intellekt hakatoni sahnasi oldida',
     namesAria: 'Chapdan oʻngga',
+    roles: [
+      { role: 'Frontend dasturchi va AI mutaxassis', exp: '1 yillik tajriba' },
+      { role: 'AI va backend dasturchi', exp: '1 yillik tajriba' },
+      { role: 'Dizayner va biznes-analitik', exp: '1 yillik tajriba' },
+      { role: 'Muhandis', exp: '3 yillik tajriba' },
+      { role: 'Loyiha rahbari', exp: '2 yillik tajriba' },
+    ],
     members: ['Ulugʻbek', 'Humoyun', 'Mohigul', 'Behzod', 'Muhammadjon'],
     caption: ['Milliy sunʼiy intellekt hakatoni, Toshkent', '2026-yil, noyabr'],
   },

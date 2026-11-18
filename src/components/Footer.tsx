@@ -82,7 +82,7 @@ export function Footer() {
         </div>
       </div>
       <div className="footer__legal label" style={{ color: 'var(--on-night-mute)' }}>
-        <span>© {new Date().getFullYear()} Invenio</span>
+        <span>© {new Date().getFullYear()} Invenio · respai.uz</span>
         <span lang="uz">Har bir nafas muhim</span>
       </div>
     </footer>

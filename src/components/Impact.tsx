@@ -1,20 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/scroll'
-import { Clinic, Factory, Home, School } from './icons'
 import { useT } from '../i18n'
 
-const PRICE = 500_000 // soʻm per unit
-
-/** unit thresholds; titles and texts come from the dictionary (same order) */
-const MILESTONES = [100, 500, 1000]
-const USE_ICONS = [Clinic, School, Home, Factory]
+const PRICE = 553_000 // soʻm per device (pitch deck, monetisation slide)
+const ALL_INSTITUTIONS = 8_912 // medical institutions in Uzbekistan (TAM)
 
 export function Impact() {
   const T = useT()
   const t = T.impact
-  const fmt = (n: number, digits = 0) => n.toLocaleString(T.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
+  const fmt = (n: number, digits = 0) => n.toLocaleString(T.locale, { maximumFractionDigits: digits })
   const ref = useRef<HTMLElement>(null)
-  const [clinics, setClinics] = useState(1000)
+  const [clinics, setClinics] = useState(ALL_INSTITUTIONS)
   const [per, setPer] = useState(3)
   const units = clinics * per
   const turnover = units * PRICE
@@ -22,7 +18,7 @@ export function Impact() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      gsap.from('.use', { y: 50, opacity: 0, duration: 1.1, ease: 'expo.out', stagger: 0.07, scrollTrigger: { trigger: '.uses', start: 'top 85%' } })
+      gsap.from('.mseg', { y: 30, opacity: 0, duration: 0.9, ease: 'power2.out', stagger: 0.07, scrollTrigger: { trigger: '.msegs', start: 'top 85%' } })
     }, ref)
     return () => ctx.revert()
   }, [])
@@ -37,8 +33,21 @@ export function Impact() {
         <p className="lead">{t.lead}</p>
       </div>
 
-      <div className="calc">
-        <div>
+      <h3 className="impact__sub">{t.segTitle}</h3>
+      <div className="msegs">
+        {t.segments.map((s) => (
+          <div className="mseg" key={s.k}>
+            <span className="mseg__k">{s.k}</span>
+            <b>{s.value}</b>
+            <p>{s.reach}</p>
+          </div>
+        ))}
+      </div>
+      <p className="label mute impact__note">{t.segNote}</p>
+
+      <div className="impact__duo">
+        <div className="calc">
+          <h3 className="impact__sub">{t.calcTitle}</h3>
           <div className="range">
             <div className="range__head">
               <label className="label" htmlFor="clinics">
@@ -46,7 +55,7 @@ export function Impact() {
               </label>
               <b>{fmt(clinics)}</b>
             </div>
-            <input id="clinics" type="range" min={100} max={10000} step={100} value={clinics} onChange={(e) => setClinics(+e.target.value)} />
+            <input id="clinics" type="range" min={50} max={ALL_INSTITUTIONS} step={1} value={clinics} onChange={(e) => setClinics(+e.target.value)} />
           </div>
           <div className="range">
             <div className="range__head">
@@ -57,46 +66,54 @@ export function Impact() {
             </div>
             <input id="per" type="range" min={1} max={6} step={1} value={per} onChange={(e) => setPer(+e.target.value)} />
           </div>
-          <p className="label mute">
-            {t.unitsLine(fmt(units), fmt(PRICE))}
-          </p>
-        </div>
-        <div className="calc__out" aria-live="polite">
-          {bn >= 1 ? fmt(bn, bn >= 10 ? 0 : 1) : fmt(turnover / 1e6)}
-          <span style={{ fontSize: '0.4em', letterSpacing: '-0.03em' }}>
-            {' '}
-            {bn >= 1 ? t.bn : t.mln} {t.currency}
-          </span>
-          <small>{t.projected}</small>
-        </div>
-      </div>
-
-      <div className="milestones">
-        {MILESTONES.map((at, i) => (
-          <div key={at} className={`milestone ${units >= at ? 'is-reached' : ''}`}>
-            <span className="label mute">{t.units(at >= 1000 ? `${fmt(at)}+` : fmt(at))}</span>
-            <b>{t.milestones[i].title}</b>
-            <p className="mute" style={{ margin: 0, maxWidth: '30ch' }}>
-              {t.milestones[i].text}
-            </p>
+          <p className="label mute">{t.unitsLine(fmt(units), fmt(PRICE))}</p>
+          <div className="calc__out" aria-live="polite">
+            {bn >= 1 ? fmt(bn, 3) : fmt(turnover / 1e6)}
+            <span>
+              {' '}
+              {bn >= 1 ? t.bn : t.mln} {t.currency}
+            </span>
+            <small>{t.projected}</small>
           </div>
-        ))}
+        </div>
+
+        <div className="pricing">
+          <span className="label mute">{t.pricing.who}</span>
+          <p className="pricing__who">{t.pricing.whoText}</p>
+          <div className="pricing__price">
+            {t.pricing.price}
+            <small>{t.pricing.priceUnit}</small>
+          </div>
+          <span className="label mute">{t.pricing.whyTitle}</span>
+          <ul>
+            {t.pricing.why.map((w) => (
+              <li key={w}>{w}</li>
+            ))}
+          </ul>
+        </div>
       </div>
 
-      <div className="uses">
-        {t.uses.map(({ title, text }, i) => {
-          const Icon = USE_ICONS[i]
-          return (
-          <article className="use" key={i}>
-            <Icon />
-            <div>
-              <h4>{title}</h4>
-              <p className="mute">{text}</p>
-            </div>
-          </article>
-          )
-        })}
-      </div>
+      <h3 className="impact__sub">{t.customersTitle}</h3>
+      <ol className="customers">
+        {t.customers.map((c, i) => (
+          <li key={c}>
+            <span>0{i + 1}</span>
+            {c}
+          </li>
+        ))}
+      </ol>
+
+      <h3 className="impact__sub">{t.roadmapTitle}</h3>
+      <ol className="roadmap">
+        {t.roadmap.map((r, i) => (
+          <li key={r.when} className={i === 0 ? 'is-now' : ''}>
+            <span className="roadmap__when">{r.when}</span>
+            <b>{r.a}</b>
+            <span className="mute">{r.b}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="label mute impact__note">{t.roadmapNote}</p>
     </section>
   )
 }

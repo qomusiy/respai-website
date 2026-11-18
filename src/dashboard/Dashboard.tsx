@@ -10,11 +10,8 @@ const HISTORY_KEY = 'respai-history'
 const ORDER = ['healthy_cough', 'upper_infection', 'lower_infection', 'obstructive_disease', 'COVID-19']
 
 const pct = (v: number, locale: string, digits = 0) => (v * 100).toLocaleString(locale, { maximumFractionDigits: digits, minimumFractionDigits: digits }) + '%'
-/** browsers format Uzbek dates oddly ("2026 M11 18"); use the usual 18.11.2026, 13:57 there */
-const fmtDate = (t: number, locale: string) =>
-  locale.startsWith('uz')
-    ? new Date(t).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-    : new Date(t).toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })
+/** numeric date and time (18.11.2026, 13:57), so no language ever gets another language's month names */
+const fmtDate = (t: number, locale: string) => new Date(t).toLocaleString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 const level = (p: number): 'low' | 'moderate' | 'high' => (p < 0.4 ? 'low' : p < 0.65 ? 'moderate' : 'high')
 
 // —————————————————— server status ——————————————————

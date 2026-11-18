@@ -1554,6 +1554,44 @@ a {
 .team__copy .h2 {
   margin-bottom: 22px;
 }
+.team__roles {
+  list-style: none;
+  margin: 30px 0 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+}
+.team__roles li {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr) auto;
+  gap: 4px 16px;
+  align-items: baseline;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--line);
+  transition: background-color 0.2s;
+}
+.team__roles li.is-on {
+  background: linear-gradient(90deg, rgba(11, 12, 14, 0.04), transparent);
+}
+.team__roles b {
+  font-weight: 500;
+}
+.team__roles span {
+  color: var(--ink-2);
+}
+.team__roles small {
+  font-size: 13px;
+  color: var(--mute);
+  white-space: nowrap;
+}
+@media (max-width: 520px) {
+  .team__roles li {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .team__roles span {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}
 .team__figure {
   margin: 0;
   width: 100%;
@@ -2083,32 +2121,75 @@ a {
   }
 }
 
-/* ———————————— impact ———————————— */
+/* ———————————— impact (market & business model) ———————————— */
 .impact {
   background: var(--paper);
 }
-.calc {
+.impact__sub {
+  font-size: clamp(20px, 1.8vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 0 0 18px;
+}
+.impact__note {
+  margin: 14px 0 0;
+}
+/* TAM / SAM / SOM */
+.msegs {
   display: grid;
-  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+.mseg {
+  padding: 22px 24px 26px;
+  border-radius: 12px;
+  background: var(--bg);
+}
+.mseg__k {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--mute);
+}
+.mseg b {
+  display: block;
+  font-size: clamp(28px, 2.8vw, 42px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+  margin: 10px 0 10px;
+}
+.mseg p {
+  margin: 0;
+  color: var(--ink-2);
+  line-height: 1.45;
+}
+.impact__duo {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   gap: clamp(24px, 4vw, 64px);
-  align-items: end;
-  padding-bottom: clamp(60px, 8vw, 120px);
-  border-bottom: 1px solid var(--line);
+  align-items: start;
+  margin: clamp(56px, 7vw, 100px) 0;
 }
 .calc__out {
-  font-size: clamp(48px, 6vw, 104px);
+  margin-top: 26px;
+  font-size: clamp(44px, 5vw, 84px);
   letter-spacing: -0.04em;
   line-height: 0.95;
   font-weight: 500;
   font-variant-numeric: tabular-nums;
 }
+.calc__out span {
+  font-size: 0.4em;
+  letter-spacing: -0.02em;
+}
 .calc__out small {
   display: block;
-  font-size: 15px;
-  letter-spacing: -0.02em;
+  font-size: 14px;
+  letter-spacing: 0;
   margin-top: 14px;
   color: var(--mute);
   font-weight: 400;
+  line-height: 1.45;
 }
 .range {
   display: grid;
@@ -2123,7 +2204,7 @@ a {
 .range__head b {
   font-size: 30px;
   font-weight: 500;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
 input[type='range'] {
@@ -2148,135 +2229,131 @@ input[type='range']::-webkit-slider-thumb {
   height: 14px;
   margin-top: -7px;
   background: var(--ink);
-  border-radius: 0;
+  border-radius: 50%;
 }
 input[type='range']::-moz-range-thumb {
   width: 14px;
   height: 14px;
   background: var(--ink);
   border: 0;
-  border-radius: 0;
+  border-radius: 50%;
 }
-.milestones {
+/* who pays */
+.pricing {
+  padding: 28px;
+  border-radius: 14px;
+  background: var(--ink);
+  color: #fff;
+}
+.pricing .label {
+  color: rgba(255, 255, 255, 0.6);
+}
+.pricing__who {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 8px 0 22px;
+}
+.pricing__price {
+  font-size: clamp(40px, 4vw, 60px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  margin-bottom: 26px;
+}
+.pricing__price small {
+  display: block;
+  font-size: 15px;
+  letter-spacing: 0;
+  font-weight: 400;
+  margin-top: 8px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.pricing ul {
+  margin: 10px 0 0;
+  padding-left: 18px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
-  margin-top: clamp(48px, 6vw, 90px);
+  gap: 8px;
+  line-height: 1.45;
 }
-.milestone {
+/* potential customers */
+.customers {
+  list-style: none;
+  margin: 0 0 clamp(56px, 7vw, 100px);
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+.customers li {
+  padding: 18px 18px 22px;
+  border-radius: 12px;
+  background: var(--bg);
+  line-height: 1.4;
+  font-size: 15.5px;
+}
+.customers li span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--mute);
+  margin-bottom: 18px;
+}
+/* goals & KPIs */
+.roadmap {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+.roadmap li {
   position: relative;
-  padding: 28px 24px 0 0;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  padding: 26px 20px 0 0;
   border-top: 1px solid var(--line);
 }
-.milestone::before {
+.roadmap li::before {
   content: '';
   position: absolute;
   top: -5px;
   left: 0;
   width: 9px;
   height: 9px;
+  border-radius: 50%;
   background: var(--ink);
 }
-.milestone.is-reached::before {
+.roadmap li.is-now::before {
   background: var(--good);
+  box-shadow: 0 0 0 4px rgba(18, 161, 80, 0.18);
 }
-.milestone b {
-  display: block;
-  font-size: clamp(26px, 2.4vw, 38px);
+.roadmap__when {
+  font-size: 13px;
+  color: var(--mute);
+}
+.roadmap b {
+  font-size: clamp(20px, 1.8vw, 26px);
   font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-  margin: 10px 0 8px;
-}
-.uses {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: clamp(80px, 10vw, 150px);
-}
-.use {
-  background: var(--bg);
-  padding: 20px;
-  border-radius: 4px;
-  min-height: 250px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: 24px;
-  transition:
-    background 0.4s var(--ease),
-    color 0.4s var(--ease),
-    transform 0.6s var(--ease);
-}
-.use:hover {
-  background: var(--ink);
-  color: #fff;
-  transform: translateY(-6px);
-}
-.use:hover .mute {
-  color: rgba(255, 255, 255, 0.6);
-}
-.use svg {
-  width: 34px;
-  height: 34px;
-}
-.use h4 {
-  margin: 0 0 8px;
-  font-size: 22px;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-.use p {
-  margin: 0;
-  font-size: 14px;
-}
-.principles {
-  margin-top: clamp(80px, 10vw, 150px);
-}
-.principle {
-  display: grid;
-  grid-template-columns: 60px 1fr 40px 1fr;
-  gap: 16px;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: clamp(17px, 1.6vw, 22px);
   letter-spacing: -0.02em;
-}
-.principle:first-of-type {
-  border-top: 1px solid var(--line);
-}
-.principle svg {
-  width: 22px;
-  height: 22px;
+  line-height: 1.15;
 }
 @media (max-width: 1000px) {
-  .calc {
+  .impact__duo {
     grid-template-columns: minmax(0, 1fr);
   }
-  .uses {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  .customers {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .roadmap {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: 32px;
   }
 }
 @media (max-width: 640px) {
-  .milestones {
+  .msegs,
+  .customers {
     grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
-  }
-  .uses {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .principle {
-    grid-template-columns: 34px 1fr;
-  }
-  .principle svg {
-    display: none;
-  }
-  .principle > :last-child {
-    grid-column: 2;
-    color: var(--mute);
-    font-size: 15px;
   }
 }
 

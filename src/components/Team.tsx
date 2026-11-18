@@ -27,6 +27,15 @@ export function Team() {
             {t.title}
           </h2>
           <p className="lead">{t.lead}</p>
+          <ul className="team__roles">
+            {t.members.map((name, i) => (
+              <li key={i} onMouseEnter={() => setFocus(i)} onMouseLeave={() => setFocus(null)} className={focus === i ? 'is-on' : ''}>
+                <b>{name}</b>
+                <span>{t.roles[i]?.role}</span>
+                <small>{t.roles[i]?.exp}</small>
+              </li>
+            ))}
+          </ul>
         </div>
 
         <figure className="team__figure">
