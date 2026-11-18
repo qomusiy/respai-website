@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useProgress } from '@react-three/drei'
 import { lenis } from '../lib/scroll'
 import { Mark } from './icons'
+import { useT } from '../i18n'
 
 export function Loader() {
+  const t = useT()
   const { progress, active } = useProgress()
   const [shown, setShown] = useState(0)
   const [done, setDone] = useState(false)
@@ -44,7 +46,7 @@ export function Loader() {
   }, [])
 
   return (
-    <div className={`loader ${done ? 'is-done' : ''}`} aria-hidden={done} role="status" aria-label="Loading">
+    <div className={`loader ${done ? 'is-done' : ''}`} aria-hidden={done} role="status" aria-label={t.loading}>
       <div className="loader__inner">
         <span className="logo">
           <Mark /> RespAI

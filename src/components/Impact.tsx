@@ -1,25 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap } from '../lib/scroll'
 import { Clinic, Factory, Home, School } from './icons'
+import { useT } from '../i18n'
 
 const PRICE = 500_000 // soʻm per unit
 
-const MILESTONES = [
-  { at: 100, title: 'Payback', text: 'The project returns its investment at 100 units.' },
-  { at: 500, title: 'Sustainable income', text: 'Stable revenue from 500 installed devices.' },
-  { at: 1000, title: 'Expansion', text: '1,000+ units: scale to new regions and sectors.' },
-]
-
-const USES = [
-  { icon: Clinic, title: 'Clinics', text: 'Objective cough counts between visits, synced to the app.' },
-  { icon: School, title: 'Schools & colleges', text: 'Spot a rise in coughing early, in the rooms where viruses spread fastest.' },
-  { icon: Home, title: 'Homes', text: 'Remote monitoring of a patient’s condition, plus gas-leak alerts in the kitchen.' },
-  { icon: Factory, title: 'Workplaces', text: 'Safer air and early warning for teams working near gas.' },
-]
-
-const fmt = (n: number) => n.toLocaleString('en-US')
+/** unit thresholds; titles and texts come from the dictionary (same order) */
+const MILESTONES = [100, 500, 1000]
+const USE_ICONS = [Clinic, School, Home, Factory]
 
 export function Impact() {
+  const T = useT()
+  const t = T.impact
+  const fmt = (n: number, digits = 0) => n.toLocaleString(T.locale, { minimumFractionDigits: digits, maximumFractionDigits: digits })
   const ref = useRef<HTMLElement>(null)
   const [clinics, setClinics] = useState(1000)
   const [per, setPer] = useState(3)
@@ -37,11 +30,11 @@ export function Impact() {
   return (
     <section className="section impact above" id="impact" ref={ref} aria-labelledby="impact-title">
       <div className="section-head">
-        <span className="eyebrow">Market</span>
+        <span className="eyebrow">{t.eyebrow}</span>
         <h2 id="impact-title" className="h2">
-          Starting with clinics in Uzbekistan
+          {t.title}
         </h2>
-        <p className="lead">Affordable and produced locally. We start with clinics, then move to schools, homes and workplaces.</p>
+        <p className="lead">{t.lead}</p>
       </div>
 
       <div className="calc">
@@ -49,7 +42,7 @@ export function Impact() {
           <div className="range">
             <div className="range__head">
               <label className="label" htmlFor="clinics">
-                Clinics
+                {t.clinics}
               </label>
               <b>{fmt(clinics)}</b>
             </div>
@@ -58,45 +51,51 @@ export function Impact() {
           <div className="range">
             <div className="range__head">
               <label className="label" htmlFor="per">
-                Devices per clinic
+                {t.perClinic}
               </label>
               <b>{per}</b>
             </div>
             <input id="per" type="range" min={1} max={6} step={1} value={per} onChange={(e) => setPer(+e.target.value)} />
           </div>
           <p className="label mute">
-            {fmt(units)} units × {fmt(PRICE)} soʻm per device
+            {t.unitsLine(fmt(units), fmt(PRICE))}
           </p>
         </div>
         <div className="calc__out" aria-live="polite">
-          {bn >= 1 ? bn.toFixed(bn >= 10 ? 0 : 1) : (turnover / 1e6).toFixed(0)}
-          <span style={{ fontSize: '0.4em', letterSpacing: '-0.03em' }}>{bn >= 1 ? ' bn' : ' mln'} soʻm</span>
-          <small>Projected turnover · e.g. 3 units in 1,000 clinics = 1.5 billion soʻm</small>
+          {bn >= 1 ? fmt(bn, bn >= 10 ? 0 : 1) : fmt(turnover / 1e6)}
+          <span style={{ fontSize: '0.4em', letterSpacing: '-0.03em' }}>
+            {' '}
+            {bn >= 1 ? t.bn : t.mln} {t.currency}
+          </span>
+          <small>{t.projected}</small>
         </div>
       </div>
 
       <div className="milestones">
-        {MILESTONES.map((m) => (
-          <div key={m.at} className={`milestone ${units >= m.at ? 'is-reached' : ''}`}>
-            <span className="label mute">{m.at >= 1000 ? '1,000+' : m.at} units</span>
-            <b>{m.title}</b>
+        {MILESTONES.map((at, i) => (
+          <div key={at} className={`milestone ${units >= at ? 'is-reached' : ''}`}>
+            <span className="label mute">{t.units(at >= 1000 ? `${fmt(at)}+` : fmt(at))}</span>
+            <b>{t.milestones[i].title}</b>
             <p className="mute" style={{ margin: 0, maxWidth: '30ch' }}>
-              {m.text}
+              {t.milestones[i].text}
             </p>
           </div>
         ))}
       </div>
 
       <div className="uses">
-        {USES.map(({ icon: Icon, title, text }) => (
-          <article className="use" key={title}>
+        {t.uses.map(({ title, text }, i) => {
+          const Icon = USE_ICONS[i]
+          return (
+          <article className="use" key={i}>
             <Icon />
             <div>
               <h4>{title}</h4>
               <p className="mute">{text}</p>
             </div>
           </article>
-        ))}
+          )
+        })}
       </div>
     </section>
   )

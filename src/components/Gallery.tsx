@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { gsap } from '../lib/scroll'
+import { useT } from '../i18n'
 
 const B = import.meta.env.BASE_URL
 
@@ -15,6 +16,7 @@ export function Img({ name, alt, sizes, widths = [700, 1200, 2000] }: { name: st
 }
 
 export function Gallery() {
+  const t = useT().gallery
   const ref = useRef<HTMLElement>(null)
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -29,26 +31,26 @@ export function Gallery() {
   return (
     <section className="section gallery above" ref={ref} aria-labelledby="gallery-title">
       <div className="section-head">
-        <span className="eyebrow">Prototype</span>
+        <span className="eyebrow">{t.eyebrow}</span>
         <h2 id="gallery-title" className="h2">
-          The working prototype
+          {t.title}
         </h2>
-        <p className="lead">Photos of the current RespAI unit. The screen is showing real detections: the word “cough”, its probability and the running count.</p>
+        <p className="lead">{t.lead}</p>
       </div>
       <div className="gallery__row">
         <figure className="shot shot--a" style={{ margin: 0 }}>
-          <Img name="device-front" alt="The RespAI prototype on a desk, OLED screen showing a cough detected with probability 0.84" sizes="(max-width: 800px) 100vw, 45vw" />
+          <Img name="device-front" alt={t.alts[0]} sizes="(max-width: 800px) 100vw, 45vw" />
         </figure>
         <figure className="shot shot--b" style={{ margin: 0 }}>
-          <Img name="device-closeup" alt="Close-up of the RespAI device with its embossed logo and MQ-6 gas sensor" sizes="(max-width: 800px) 50vw, 33vw" />
+          <Img name="device-closeup" alt={t.alts[1]} sizes="(max-width: 800px) 50vw, 33vw" />
         </figure>
         <figure className="shot shot--c" style={{ margin: 0 }}>
-          <Img name="oled-closeup" alt="The device OLED: WiFi OK, Firebase OK, p=0.84 cough, temperature 26.8°C, humidity 35%" sizes="(max-width: 800px) 50vw, 25vw" widths={[700, 1200]} />
+          <Img name="oled-closeup" alt={t.alts[2]} sizes="(max-width: 800px) 50vw, 25vw" widths={[700, 1200]} />
         </figure>
       </div>
       <div className="gallery__caption label mute">
-        <span>3D-printed PLA case, ESP32, 0.96″ OLED, MQ‑6 gas sensor</span>
-        <span>Tashkent, 2026</span>
+        <span>{t.caption[0]}</span>
+        <span>{t.caption[1]}</span>
       </div>
     </section>
   )

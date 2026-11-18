@@ -21,6 +21,7 @@ import { Impact } from './components/Impact'
 import { Contact } from './components/Contact'
 import { Footer } from './components/Footer'
 import { ConsentModal } from './components/ConsentModal'
+import { useLang } from './i18n'
 
 /**
  * If WebGL is unavailable or a 3D scene throws, drop the 3D views and keep the
@@ -51,6 +52,13 @@ export default function App() {
     window.addEventListener('load', onLoad)
     return () => window.removeEventListener('load', onLoad)
   }, [])
+
+  // translated text changes section heights: re-measure the scroll animations
+  const lang = useLang((s) => s.lang)
+  useEffect(() => {
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh())
+    return () => cancelAnimationFrame(id)
+  }, [lang])
 
   return (
     <>

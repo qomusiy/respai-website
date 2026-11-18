@@ -2,19 +2,12 @@ import { useEffect, useRef } from 'react'
 import { View } from '@react-three/drei'
 import { ExplodedScene, PART_LABELS } from '../three/scenes'
 import { gsap, ScrollTrigger, useScrollProgress } from '../lib/scroll'
-
-const SPECS: Array<[string, string]> = [
-  ['Size', '100 × 100 × 15 mm'],
-  ['Brain', 'ESP32 · Wi‑Fi'],
-  ['Model', 'Resp‑1, runs on the device'],
-  ['Display', '0.96″ OLED, 128 × 64'],
-  ['Listening', 'Digital microphone'],
-  ['Air', 'MQ‑6 gas · temp · humidity'],
-  ['Alerts', 'Buzzer + app notifications'],
-  ['Sync', 'Firebase cloud → Android app'],
-]
+import { useT } from '../i18n'
 
 export function DeviceSection() {
+  const t = useT().device
+  // "00 / 08 parts" with the live count spliced into the translated phrase
+  const [partsPre, partsPost] = t.parts('§', String(PART_LABELS.length).padStart(2, '0')).split('§')
   const ref = useRef<HTMLElement>(null)
   const progress = useScrollProgress(ref, 'top top', 'bottom bottom')
   const labels = useRef<Record<string, HTMLDivElement | null>>({})
@@ -48,11 +41,11 @@ export function DeviceSection() {
       <section className="section device" id="device" ref={ref} aria-labelledby="device-title">
         <div className="device__sticky">
           <div className="device__copy">
-            <span className="eyebrow">Hardware</span>
+            <span className="eyebrow">{t.eyebrow}</span>
             <h2 id="device-title" className="h2">
-              What is inside
+              {t.title}
             </h2>
-            <p className="lead">Eight parts in a 3D-printed case, from the ESP32 board to the gas sensor. Scroll to take it apart.</p>
+            <p className="lead">{t.lead}</p>
           </div>
           <View className="view" index={4}>
             <ExplodedScene progress={progress} labelEls={labels} />
@@ -69,15 +62,17 @@ export function DeviceSection() {
                 <span className="part-label__dot" />
                 <span className="part-label__line" />
                 <div className="part-label__box">
-                  <b>{l.title}</b>
-                  <span>{l.text}</span>
+                  <b>{t.labels[l.id]?.title}</b>
+                  <span>{t.labels[l.id]?.text}</span>
                 </div>
               </div>
             ))}
           </div>
           <div className="device__progress label">
             <span>
-              <span ref={count}>00</span> / {String(PART_LABELS.length).padStart(2, '0')} parts
+              {partsPre}
+              <span ref={count}>00</span>
+              {partsPost}
             </span>
             <div className="bar" ref={bar}>
               <i />
@@ -85,9 +80,9 @@ export function DeviceSection() {
           </div>
         </div>
       </section>
-      <section className="section" style={{ paddingTop: 0 }} aria-label="Specifications">
+      <section className="section" style={{ paddingTop: 0 }} aria-label={t.specsAria}>
         <div className="specsheet above">
-          {SPECS.map(([k, v]) => (
+          {t.specs.map(({ k, v }) => (
             <div key={k}>
               <span className="label mute">{k}</span>
               <b>{v}</b>

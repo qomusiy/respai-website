@@ -2,25 +2,19 @@ import { useEffect, useRef } from 'react'
 import { ScrollTrigger, scrollToId } from '../lib/scroll'
 import { ArrowDown } from './icons'
 import { drawColumn, fitCanvas, whileVisible } from './viz'
+import { useT } from '../i18n'
 
-const SPECS = [
-  { v: '89.58', unit: '%', label: 'Accuracy' },
-  { v: '164', unit: 'ms', label: 'Inference time, int8' },
-  { v: '15.4', unit: 'KB', label: 'Peak RAM, int8' },
-  { v: '80', unit: 'MHz', label: 'Benchmark chip, Cortex‑M4F' },
-  { v: '0', unit: 'bytes', label: 'Audio uploaded' },
-]
-
-const STEPS = [
-  { t: 'Listen', p: 'A digital microphone on the device picks up sound in the room.' },
-  { t: 'Window', p: 'The audio is cut into short, overlapping windows.' },
-  { t: 'Spectrogram', p: 'Each window is turned into a mel spectrogram, a picture of how the sound energy is spread across frequencies.' },
-  { t: 'Classify', p: 'A compact 8-bit neural network scores the spectrogram.' },
-  { t: 'Count', p: 'Coughs are counted and logged on the device, then synced to the app.' },
+/** value, decimals (labels and units come from the dictionary, same order) */
+const SPECS: Array<[number, number]> = [
+  [89.58, 2],
+  [164, 0],
+  [15.4, 1],
+  [80, 0],
+  [0, 0],
 ]
 
 // ——— small looping visualisations for each pipeline step ———
-function StepViz({ kind }: { kind: number }) {
+function StepViz({ kind, labels }: { kind: number; labels: [string, string] }) {
   const ref = useRef<HTMLCanvasElement>(null)
   useEffect(() => {
     const c = ref.current
@@ -132,8 +126,8 @@ function StepViz({ kind }: { kind: number }) {
         const cg = cough(t) > 0.05 ? 1 : 0
         const pc = 0.06 + cg * 0.85 + Math.sin(t / 200) * 0.02
         const rows: Array<[string, number, string]> = [
-          ['Cough', pc, '#ff5a1f'],
-          ['Noise', 1 - pc, '#38e8f5'],
+          [labels[0], pc, '#ff5a1f'],
+          [labels[1], 1 - pc, '#38e8f5'],
         ]
         rows.forEach(([label, v, color], i) => {
           const y = h / 2 - 22 + i * 36
@@ -148,11 +142,12 @@ function StepViz({ kind }: { kind: number }) {
         })
       }
     })
-  }, [kind])
+  }, [kind, labels[0], labels[1]])
   return <canvas ref={ref} />
 }
 
 export function ModelSection() {
+  const t = useT()
   const ref = useRef<HTMLElement>(null)
   const pipe = useRef<HTMLDivElement>(null)
 
@@ -173,20 +168,20 @@ export function ModelSection() {
   return (
     <section className="section section--night model" id="model" data-nav="dark" ref={ref} aria-labelledby="model-title">
       <div className="section-head">
-        <span className="eyebrow">How it works</span>
+        <span className="eyebrow">{t.model.eyebrow}</span>
         <h2 id="model-title" className="h2">
-          A cough model small enough for a microcontroller
+          {t.model.title}
         </h2>
-        <p className="lead">Resp‑1 is our cough model. We trained it in Edge Impulse on labelled cough and background-noise recordings and quantised it to 8-bit integers so it runs on the device without an internet connection.</p>
+        <p className="lead">{t.model.lead}</p>
       </div>
 
       <div className="specs">
-        {SPECS.map((s) => (
-          <div className="spec" key={s.label}>
-            <span className="label mute">{s.label}</span>
+        {SPECS.map(([v, d], i) => (
+          <div className="spec" key={i}>
+            <span className="label mute">{t.model.specs[i].label}</span>
             <div className="spec__v">
-              {s.v}
-              <small>{s.unit}</small>
+              {v.toLocaleString(t.locale, { minimumFractionDigits: d, maximumFractionDigits: d })}
+              <small>{t.model.specs[i].unit}</small>
             </div>
           </div>
         ))}
@@ -194,18 +189,18 @@ export function ModelSection() {
 
       <div className="pipeline">
         <h3 className="h3" style={{ marginBottom: 40 }}>
-          From sound to a cough count
+          {t.model.stepsTitle}
         </h3>
         <div className="pipe" ref={pipe}>
           <div className="pipe__rail">
             <i />
             <b />
           </div>
-          {STEPS.map((s, i) => (
-            <div className="step" key={s.t}>
+          {t.model.steps.map((s, i) => (
+            <div className="step" key={i}>
               <span className="step__n">0{i + 1}</span>
               <div className="step__viz">
-                <StepViz kind={i} />
+                <StepViz kind={i} labels={[t.play.cough, t.play.noise]} />
               </div>
               <h4>{s.t}</h4>
               <p>{s.p}</p>
@@ -216,7 +211,7 @@ export function ModelSection() {
 
       <div className="model__cta">
         <button className="btn btn--night" onClick={() => scrollToId('try')}>
-          Try it in your browser <ArrowDown />
+          {t.model.cta} <ArrowDown />
         </button>
       </div>
     </section>

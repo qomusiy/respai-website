@@ -4,17 +4,15 @@ import { HeroScene } from '../three/scenes'
 import { useApp, live, type OledMode } from '../lib/live'
 import { gsap, ScrollTrigger, scrollToId, useScrollProgress } from '../lib/scroll'
 import { Arrow } from './icons'
+import { useT } from '../i18n'
 
-const FEATURES: Array<{ name: string; oled: OledMode; desc: string }> = [
-  { name: 'Cough detection', oled: 'status', desc: 'Counts coughs in real time and shows the detection probability on the screen.' },
-  { name: 'Air quality', oled: 'air', desc: 'Temperature, humidity and an MQ‑6 sensor for LPG, propane, butane and methane.' },
-  { name: 'Runs on the device', oled: 'boot', desc: 'The model runs on an ESP32 microcontroller. It keeps working without internet.' },
-  { name: 'Medication reminders', oled: 'reminder', desc: 'Doses scheduled in the app make the device beep and show a reminder.' },
-  { name: 'Privacy', oled: 'privacy', desc: 'Sound is analysed on the device and never recorded or uploaded.' },
-]
+/** what the device screen shows for each hero feature (same order as t.hero.features) */
+const OLED: OledMode[] = ['status', 'air', 'boot', 'reminder', 'privacy']
+const COUNT = OLED.length
 
 export function Hero() {
   const ref = useRef<HTMLElement>(null)
+  const t = useT()
   const progress = useScrollProgress(ref, 'top top', 'bottom top')
   const index = useApp((s) => s.heroIndex)
   const setIndex = useApp((s) => s.setHeroIndex)
@@ -23,14 +21,14 @@ export function Hero() {
   // cycle through the features until the visitor picks one
   useEffect(() => {
     if (!auto) return
-    const id = setInterval(() => setIndex((useApp.getState().heroIndex + 1) % FEATURES.length), 5200)
+    const id = setInterval(() => setIndex((useApp.getState().heroIndex + 1) % COUNT), 5200)
     return () => clearInterval(id)
   }, [auto, setIndex])
 
   // the selected feature decides what the device screen shows, while the hero is on screen
   const inView = useRef(true)
   useEffect(() => {
-    live.oledMode = inView.current ? FEATURES[index].oled : 'status'
+    live.oledMode = inView.current ? OLED[index] : 'status'
   }, [index])
   useEffect(() => {
     const st = ScrollTrigger.create({
@@ -39,7 +37,7 @@ export function Hero() {
       end: 'bottom 30%',
       onToggle: (s) => {
         inView.current = s.isActive
-        live.oledMode = s.isActive ? FEATURES[useApp.getState().heroIndex].oled : 'status'
+        live.oledMode = s.isActive ? OLED[useApp.getState().heroIndex] : 'status'
       },
     })
     return () => st.kill()
@@ -77,34 +75,34 @@ export function Hero() {
 
       <div className="hero__copy">
         <p className="eyebrow" data-hero-fade>
-          RespAI · made in Uzbekistan
+          {t.hero.eyebrow}
         </p>
         <h1 className="display" data-hero-fade>
-          Cough and air monitoring in one small device
+          {t.hero.title}
         </h1>
         <p className="hero__lead" data-hero-fade>
-          RespAI counts coughs with a neural network that runs on the device itself and keeps track of the air in the room. We are building it for clinics first, then classrooms and homes.
+          {t.hero.lead}
         </p>
         <div className="hero__actions" data-hero-fade>
           <button className="btn btn--dark" onClick={() => scrollToId('try')}>
-            Try the live demo <Arrow />
+            {t.hero.ctaDemo} <Arrow />
           </button>
           <button className="btn btn--ghost" onClick={() => scrollToId('device')}>
-            See the hardware
+            {t.hero.ctaHardware}
           </button>
         </div>
       </div>
 
       <div className="hero__features" data-hero-fade>
-        <div role="tablist" aria-label="What RespAI does">
-          {FEATURES.map((f, i) => (
-            <button key={f.name} role="tab" aria-selected={i === index} className={i === index ? 'is-active' : ''} onClick={() => pick(i)}>
+        <div role="tablist" aria-label={t.hero.featuresLabel}>
+          {t.hero.features.map((f, i) => (
+            <button key={i} role="tab" aria-selected={i === index} className={i === index ? 'is-active' : ''} onClick={() => pick(i)}>
               {f.name}
             </button>
           ))}
         </div>
         <p className="hero__desc" aria-live="polite">
-          {FEATURES[index].desc}
+          {t.hero.features[index].desc}
         </p>
       </div>
     </section>

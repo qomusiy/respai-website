@@ -7,13 +7,15 @@ import { requestConsent } from './ConsentModal'
 import { Mic, Play, Shield, Stop, Upload } from './icons'
 import { drawColumn, fitCanvas } from './viz'
 import { gsap } from '../lib/scroll'
+import { getT, useLang, useT } from '../i18n'
 
-const SAMPLES: Array<{ kind: SampleKind; label: string; hint: string }> = [
-  { kind: 'cough', label: 'Cough', hint: '' },
-  { kind: 'double-cough', label: 'Double cough', hint: '' },
-  { kind: 'speech', label: 'Speech', hint: 'should be ignored' },
-  { kind: 'clap', label: 'Claps', hint: 'should be ignored' },
-  { kind: 'noise', label: 'Fan noise', hint: 'should be ignored' },
+/** sample, and whether the detector should ignore it */
+const SAMPLES: Array<[SampleKind, boolean]> = [
+  ['cough', false],
+  ['double-cough', false],
+  ['speech', true],
+  ['clap', true],
+  ['noise', true],
 ]
 
 /** A muted or disconnected input delivers exact zeros (≈ −120 dBFS); a real room never drops below ≈ −95. */
@@ -21,9 +23,12 @@ const SILENT_DB = -105
 const SILENT_CHECK_MS = 2500
 const SILENCE = new Float32Array(40)
 
-const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+const fmtTime = (ms: number, locale: string) => new Date(ms).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
 export function Playground() {
+  const T = useT()
+  const t = T.play
+  const lang = useLang((s) => s.lang)
   const ref = useRef<HTMLElement>(null)
   const [engine, setEngine] = useState<RespEngine | null>(null)
   const engineRef = useRef<RespEngine | null>(null)
@@ -111,7 +116,8 @@ export function Playground() {
     if (valNoise.current) valNoise.current.textContent = (f.label === 'silence' ? 0 : 1 - p).toFixed(2)
     if (stateEl.current) {
       const cough = f.label === 'cough' || p > 0.6
-      const txt = cough ? 'Cough detected' : f.label === 'silence' ? 'Listening…' : 'Noise'
+      const tp = getT().play
+      const txt = cough ? tp.coughDetected : f.label === 'silence' ? tp.listening : tp.noise
       if (stateEl.current.textContent !== txt) stateEl.current.textContent = txt
       stateEl.current.classList.toggle('is-cough', cough)
     }
@@ -133,13 +139,13 @@ export function Playground() {
       drawColumn(ctx, colImg.current, SILENCE, c.width - 1, c.height)
       if (levelBar.current) levelBar.current.style.transform = 'scaleX(0)'
       if (stateEl.current && engineState !== 'listening' && engineState !== 'playing') {
-        stateEl.current.textContent = 'Ready'
+        stateEl.current.textContent = getT().play.ready
         stateEl.current.classList.remove('is-cough')
       }
     }
     raf = requestAnimationFrame(idle)
     return () => cancelAnimationFrame(raf)
-  }, [engineState])
+  }, [engineState, lang])
 
   // A mic that only ever delivers digital silence is muted or unplugged at the OS level:
   // the browser reports it as working, so say so instead of looking broken.
@@ -210,7 +216,8 @@ export function Playground() {
       const result = await engine.analyzeFile(f)
       setFile({ name: f.name, busy: false, result })
     } catch (e) {
-      setFile({ name: f.name, busy: false, error: e instanceof Error ? e.message : 'Could not decode this file' })
+      console.warn('[RespAI] could not analyse file', e)
+      setFile({ name: f.name, busy: false, error: 'decode' })
     }
   }
 
@@ -227,60 +234,38 @@ export function Playground() {
     <section className="section section--night play" id="try" data-nav="dark" ref={ref} aria-labelledby="try-title">
       <div className="play__grid">
         <div className="play__intro">
-          <span className="eyebrow">Live demo</span>
+          <span className="eyebrow">{t.eyebrow}</span>
           <h2 id="try-title" className="h2">
-            Try the detector in your browser
+            {t.title}
           </h2>
           <p className="lead" style={{ marginTop: 20 }}>
-            Turn on your microphone and cough, or play one of the sample sounds. Detection runs inside this browser tab in real time, and no audio is uploaded.
+            {t.lead}
           </p>
 
           <div style={{ marginTop: 22 }}>
-            <span className="engine-badge" title={isEI ? engineInfo?.name : 'A lightweight detector built for this website. The device itself runs the Resp‑1 model.'}>
+            <span className="engine-badge" title={isEI ? engineInfo?.name : t.badgeBrowserTip}>
               <span className={`dot ${isEI ? 'dot--live' : 'dot--cyan'}`} />
-              {engineInfo ? (isEI ? 'Resp‑1 model, WebAssembly build' : 'Browser version of the detector') : 'Loading…'}
+              {engineInfo ? (isEI ? t.badgeModel : t.badgeBrowser) : t.badgeLoading}
             </span>
           </div>
 
           <div className="mic">
-            <button ref={micBtn} className={`mic__btn ${listening ? 'is-on' : ''}`} onClick={toggleMic} aria-pressed={listening} aria-label={listening ? 'Stop microphone' : 'Start microphone'} disabled={!engine}>
+            <button ref={micBtn} className={`mic__btn ${listening ? 'is-on' : ''}`} onClick={toggleMic} aria-pressed={listening} aria-label={listening ? t.micStopAria : t.micStartAria} disabled={!engine}>
               {listening ? <Stop /> : <Mic />}
             </button>
             <div className="mic__label">
-              <strong>{listening ? 'Listening…' : engineState === 'loading' ? 'Starting…' : 'Start listening'}</strong>
-              <span className="label mute">{listening ? 'Cough near your microphone' : 'Uses your microphone, processed on this device'}</span>
+              <strong>{listening ? t.micListening : engineState === 'loading' ? t.micStarting : t.micStart}</strong>
+              <span className="label mute">{listening ? t.micHintOn : t.micHintIdle}</span>
             </div>
           </div>
-          {engineState === 'error' && engineError && (
-            <p className="mic-warning" role="alert">
-              {/denied/i.test(engineError) ? (
-                <>
-                  <b>Microphone access was blocked.</b> Allow it for this site in your browser settings, or play a sample below.
-                </>
-              ) : /HTTPS/i.test(engineError) ? (
-                <>
-                  <b>The microphone needs a secure connection.</b> Open the site over https:// (or on localhost). The samples below still work.
-                </>
-              ) : /found/i.test(engineError) ? (
-                <>
-                  <b>No microphone was found.</b> Connect one, or check that your system detects it, then try again.
-                </>
-              ) : (
-                engineError
-              )}
-            </p>
-          )}
-          {silentMic && (
-            <p className="mic-warning" role="alert">
-              <b>No sound is reaching the page.</b> Your microphone is on but only sending silence. It is most likely muted in your computer&rsquo;s sound settings (or with a mic-mute key), or a different input device is selected.
-            </p>
-          )}
+          {engineState === 'error' && engineError && <MicMessage text={micErrorText(engineError, t)} />}
+          {silentMic && <MicMessage text={t.silent} />}
 
-          <div className="label mute">Or play a sample sound</div>
+          <div className="label mute">{t.samplesLabel}</div>
           <div className="samples">
-            {SAMPLES.map((s) => (
-              <button key={s.kind} className={`sample ${playing === s.kind ? 'is-playing' : ''}`} onClick={() => play(s.kind)} disabled={!engine}>
-                <Play /> {s.label} {s.hint && <em>{s.hint}</em>}
+            {SAMPLES.map(([kind, ignored]) => (
+              <button key={kind} className={`sample ${playing === kind ? 'is-playing' : ''}`} onClick={() => play(kind)} disabled={!engine}>
+                <Play /> {t.samples[kind]} {ignored && <em>{t.ignored}</em>}
               </button>
             ))}
           </div>
@@ -301,17 +286,17 @@ export function Playground() {
           >
             <Upload />
             <span>
-              <b style={{ fontWeight: 500 }}>Analyse a recording</b>
+              <b style={{ fontWeight: 500 }}>{t.dropTitle}</b>
               <br />
               <span className="mute" style={{ fontSize: 13 }}>
-                Drop an audio file (wav, mp3, m4a, ogg) or click to choose
+                {t.dropHint}
               </span>
             </span>
             <input type="file" accept="audio/*" hidden onChange={(e) => e.target.files?.[0] && analyze(e.target.files[0])} />
           </label>
 
           <p className="privacy-note">
-            <Shield /> Audio never leaves your device. Resp‑1 is a screening aid, not a medical diagnosis.
+            <Shield /> {t.privacy}
           </p>
         </div>
 
@@ -319,19 +304,19 @@ export function Playground() {
           <div className="console__top">
             <span className="label">
               <span className="dot dot--live" style={{ marginRight: 8, verticalAlign: '1px', opacity: listening ? 1 : 0.3 }} />
-              Detector output
+              {t.consoleTitle}
             </span>
-            <span className="label mute">{engineInfo ? `${engineInfo.sampleRate / 1000} kHz · ${engineInfo.windowMs} ms window` : ''}</span>
+            <span className="label mute">{engineInfo ? t.windowInfo(engineInfo.sampleRate / 1000, engineInfo.windowMs) : ''}</span>
           </div>
 
           <div className="console__stage">
             <div>
-              <div className="label mute">Status</div>
+              <div className="label mute">{t.status}</div>
               <div ref={stateEl} className="console__state" aria-live="polite">
-                Ready
+                {t.ready}
               </div>
               <div className="level">
-                <span className="label mute">Input level</span>
+                <span className="label mute">{t.inputLevel}</span>
                 <span className="level__bar">
                   <i ref={levelBar} />
                 </span>
@@ -339,15 +324,15 @@ export function Playground() {
             </div>
             <figure className="console__oled">
               <div className="bezel">
-                <canvas ref={oled} width={128} height={64} aria-label="Replica of the device screen" />
+                <canvas ref={oled} width={128} height={64} aria-label={t.oledAria} />
               </div>
-              <figcaption className="label mute">Same view as the device screen</figcaption>
+              <figcaption className="label mute">{t.oledCaption}</figcaption>
             </figure>
           </div>
 
           <div className="spectro">
             <canvas ref={spectro} />
-            <span className="label mute">Mel spectrogram, live</span>
+            <span className="label mute">{t.spectro}</span>
             <div className="spectro__axis">
               <span>8k</span>
               <span>2k</span>
@@ -357,17 +342,17 @@ export function Playground() {
 
           <div className="console__grid">
             <div>
-              <span className="label mute">Classification</span>
+              <span className="label mute">{t.classification}</span>
               <div className="probs">
                 <div className="prob__row">
-                  <span>Cough</span>
+                  <span>{t.cough}</span>
                   <span className="prob__bar">
                     <i ref={barCough} style={{ background: 'var(--alert)', transform: 'scaleX(0)' }} />
                   </span>
                   <span ref={valCough}>0.00</span>
                 </div>
                 <div className="prob__row">
-                  <span>Noise</span>
+                  <span>{t.noise}</span>
                   <span className="prob__bar">
                     <i ref={barNoise} style={{ background: 'var(--cyan)', transform: 'scaleX(0)' }} />
                   </span>
@@ -377,42 +362,42 @@ export function Playground() {
               <div className="counters">
                 <div className="counter">
                   <b>{stats.total}</b>
-                  <span className="label mute">Total</span>
+                  <span className="label mute">{t.total}</span>
                 </div>
                 <div className="counter">
                   <b>{stats.lastHour}</b>
-                  <span className="label mute">Last hour</span>
+                  <span className="label mute">{t.lastHour}</span>
                 </div>
                 <div className="counter">
                   <b>{stats.total ? Math.round(stats.avg * 100) : '—'}</b>
-                  <span className="label mute">Avg conf. %</span>
+                  <span className="label mute">{t.avgConf}</span>
                 </div>
               </div>
             </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span className="label mute">Activity</span>
+                <span className="label mute">{t.activity}</span>
                 {coughs.length > 0 && (
                   <button className="label mute" onClick={() => useApp.getState().resetCoughs()}>
-                    Reset
+                    {t.reset}
                   </button>
                 )}
               </div>
               {coughs.length === 0 ? (
-                <div className="log__empty">No coughs yet. Try the mic or a sample.</div>
+                <div className="log__empty">{t.empty}</div>
               ) : (
                 <ul className="log">
                   {coughs.slice(0, 30).map((c) => (
                     <li key={c.id}>
                       <span className="dot" />
                       <span>
-                        Cough detected <small>· {c.source}</small>
+                        {t.coughDetected} <small>· {t.sources[c.source]}</small>
                         <br />
                         <small>
-                          p={c.prob.toFixed(2)} · {Math.round(c.durationMs)} ms · {Math.round(c.peakDb)} dB
+                          p={c.prob.toFixed(2)} · {Math.round(c.durationMs)} {t.ms} · {Math.round(c.peakDb)} {t.db}
                         </small>
                       </span>
-                      <small>{fmtTime(c.wallTime)}</small>
+                      <small>{fmtTime(c.wallTime, T.locale)}</small>
                     </li>
                   ))}
                 </ul>
@@ -425,11 +410,11 @@ export function Playground() {
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
                 <span className="label">{file.name}</span>
                 <span className="label mute">
-                  {file.busy ? 'Analysing…' : file.error ? 'Error' : `${file.result!.detections.length} cough${file.result!.detections.length === 1 ? '' : 's'} · ${file.result!.durationSec.toFixed(1)} s`}
+                  {file.busy ? t.analysing : file.error ? t.error : t.fileSummary(file.result!.detections.length, file.result!.durationSec.toLocaleString(T.locale, { maximumFractionDigits: 1, minimumFractionDigits: 1 }))}
                 </span>
               </div>
-              {file.error && <p className="label" style={{ color: 'var(--alert)' }}>{file.error}</p>}
-              {file.result && <FileTimeline result={file.result} />}
+              {file.error && <p className="label" style={{ color: 'var(--alert)' }}>{t.decodeError}</p>}
+              {file.result && <FileTimeline result={file.result} label={t.timelineAria} />}
             </div>
           )}
         </div>
@@ -438,7 +423,7 @@ export function Playground() {
   )
 }
 
-function FileTimeline({ result }: { result: FileAnalysis }) {
+function FileTimeline({ result, label }: { result: FileAnalysis; label: string }) {
   const W = 600
   const H = 64
   const env = result.envelope
@@ -455,7 +440,7 @@ function FileTimeline({ result }: { result: FileAnalysis }) {
     return s + 'Z'
   }, [env])
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label="Recording timeline with detected coughs">
+    <svg viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" role="img" aria-label={label}>
       <path d={d} fill="rgba(255,255,255,.22)" />
       {result.detections.map((det) => {
         const x = (det.offsetSec / Math.max(0.01, result.durationSec)) * W
@@ -463,5 +448,25 @@ function FileTimeline({ result }: { result: FileAnalysis }) {
         return <rect key={det.id} x={x} y={0} width={w} height={H} fill="rgba(255,90,31,.45)" />
       })}
     </svg>
+  )
+}
+
+type PlayDict = ReturnType<typeof getT>['play']
+
+/** Map the engine's (English) error to a translated, actionable message. */
+function micErrorText(err: string, t: PlayDict): { b: string; rest: string } {
+  if (/denied/i.test(err)) return t.errDenied
+  if (/HTTPS/i.test(err)) return t.errHttps
+  if (/found/i.test(err)) return t.errNotFound
+  if (/busy|unavailable/i.test(err)) return t.errBusy
+  if (/disconnected/i.test(err)) return t.errDisconnected
+  return { b: err, rest: '' }
+}
+
+function MicMessage({ text }: { text: { b: string; rest: string } }) {
+  return (
+    <p className="mic-warning" role="alert">
+      <b>{text.b}</b> {text.rest}
+    </p>
   )
 }

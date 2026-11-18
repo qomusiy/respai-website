@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../lib/live'
 import { lenis } from '../lib/scroll'
 import { Check, Mic, Shield } from './icons'
+import { useT } from '../i18n'
 
 let onAllow: (() => void) | null = null
 
@@ -18,6 +19,7 @@ export function requestConsent(allow: () => void) {
 }
 
 export function ConsentModal() {
+  const t = useT().consent
   const open = useApp((s) => s.consentOpen)
   const [agree, setAgree] = useState(false)
   const checkRef = useRef<HTMLInputElement>(null)
@@ -49,39 +51,35 @@ export function ConsentModal() {
     <div className="modal" role="dialog" aria-modal="true" aria-labelledby="consent-title" onClick={(e) => e.target === e.currentTarget && close(false)}>
       <div className="modal__card">
         <span className="chip">
-          <Shield width={12} height={12} /> Consent window
+          <Shield width={12} height={12} /> {t.chip}
         </span>
-        <h3 id="consent-title">Before Resp‑1 listens.</h3>
+        <h3 id="consent-title">{t.title}</h3>
         <ul>
           <li>
             <Check />
             <span>
-              Audio is analysed <b>locally in your browser</b>. Nothing is uploaded.
+              {t.local.pre}
+              <b>{t.local.b}</b>
+              {t.local.post}
             </span>
           </li>
-          <li>
-            <Check />
-            <span>Nothing is recorded or stored. Closing the page erases everything.</span>
-          </li>
-          <li>
-            <Check />
-            <span>You can stop the microphone at any time.</span>
-          </li>
-          <li>
-            <Check />
-            <span>This is a demo, not a medical diagnosis.</span>
-          </li>
+          {t.items.map((item) => (
+            <li key={item}>
+              <Check />
+              <span>{item}</span>
+            </li>
+          ))}
         </ul>
         <label className="check">
           <input ref={checkRef} type="checkbox" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
-          <span>I agree to let this page use my microphone for live cough detection.</span>
+          <span>{t.agree}</span>
         </label>
         <div className="modal__actions">
           <button className="btn btn--dark" disabled={!agree} style={{ opacity: agree ? 1 : 0.45 }} onClick={() => close(true)}>
-            <Mic /> Allow microphone
+            <Mic /> {t.allow}
           </button>
           <button className="btn btn--ghost" onClick={() => close(false)}>
-            Not now
+            {t.notNow}
           </button>
         </div>
       </div>

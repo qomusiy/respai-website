@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useApp, live, type TelemetrySample } from '../lib/live'
 import { gsap } from '../lib/scroll'
+import { useT } from '../i18n'
+
+type GasKey = 'methane' | 'propane' | 'butane' | 'lpg'
+/** the phone mock-up copies the real (English) Android app, so it stays in English */
+const APP_GAS_NAMES: Record<GasKey, string> = { methane: 'Methane', propane: 'Propane', butane: 'Butane', lpg: 'LPG' }
 
 function Spark({ data, k, color = 'var(--ink)', min, max }: { data: TelemetrySample[]; k: keyof TelemetrySample; color?: string; min?: number; max?: number }) {
   const W = 300
@@ -28,6 +33,8 @@ function Spark({ data, k, color = 'var(--ink)', min, max }: { data: TelemetrySam
 }
 
 export function Air() {
+  const T = useT()
+  const t = T.air
   const ref = useRef<HTMLElement>(null)
   const phone = useRef<HTMLDivElement>(null)
   const telemetry = useApp((s) => s.telemetry)
@@ -58,23 +65,23 @@ export function Air() {
   }, [])
 
   const hourAgo = Date.now() - 3600_000
-  const gases: Array<[string, string, number, number]> = cur
+  const gases: Array<[GasKey, string, number, number]> = cur
     ? [
-        ['Methane', 'CH₄', cur.methane, 40],
-        ['Propane', 'C₃H₈', cur.propane, 60],
-        ['Butane', 'C₄H₁₀', cur.butane, 40],
-        ['LPG', 'mix', cur.lpg, 60],
+        ['methane', 'CH₄', cur.methane, 40],
+        ['propane', 'C₃H₈', cur.propane, 60],
+        ['butane', 'C₄H₁₀', cur.butane, 40],
+        ['lpg', '', cur.lpg, 60],
       ]
     : []
 
   return (
     <section className="section air" id="air" ref={ref} aria-labelledby="air-title">
       <div className="section-head above">
-        <span className="eyebrow">Air quality</span>
+        <span className="eyebrow">{t.eyebrow}</span>
         <h2 id="air-title" className="h2">
-          Air quality readings from the same device
+          {t.title}
         </h2>
-        <p className="lead">The same device measures temperature, humidity and flammable gas in the room, and warns you when the readings become unsafe.</p>
+        <p className="lead">{t.lead}</p>
       </div>
 
       <div className="air__grid above">
@@ -82,26 +89,28 @@ export function Air() {
           <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
             <span className="chip">
               <span className={`dot ${source === 'live' ? 'dot--live' : ''}`} style={{ color: source === 'live' ? undefined : 'var(--mute)' }} />
-              {source === 'live' ? 'Live device feed' : source === 'connecting' ? 'Connecting…' : 'Simulated feed · connect a device'}
+              {source === 'live' ? t.live : source === 'connecting' ? t.connecting : t.simulated}
             </span>
-            <span className="chip chip--line">Updated {cur ? new Date(cur.t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—'}</span>
+            <span className="chip chip--line">
+              {t.updated} {cur ? new Date(cur.t).toLocaleTimeString(T.locale, { hour: '2-digit', minute: '2-digit', second: '2-digit' }) : '—'}
+            </span>
           </div>
           <div className="tiles">
             <div className="tile">
               <div className="tile__head">
-                <span className="label">Temperature</span>
+                <span className="label">{t.temperature}</span>
                 <span className="label mute">°C</span>
               </div>
               <div className="tile__v">
-                {cur ? cur.temp.toFixed(1) : '—'}
+                {cur ? cur.temp.toLocaleString(T.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '—'}
                 <small>°C</small>
               </div>
               <Spark data={telemetry} k="temp" />
             </div>
             <div className="tile">
               <div className="tile__head">
-                <span className="label">Humidity</span>
-                <span className="label mute">RH</span>
+                <span className="label">{t.humidity}</span>
+                <span className="label mute">{t.humUnit}</span>
               </div>
               <div className="tile__v">
                 {cur ? Math.round(cur.hum) : '—'}
@@ -111,19 +120,19 @@ export function Air() {
             </div>
             <div className="tile tile--wide" style={{ background: gasAlert ? 'var(--ink)' : undefined, color: gasAlert ? '#fff' : undefined, transition: 'background .5s, color .5s' }}>
               <div className="tile__head">
-                <span className="label">MQ‑6 gas sensor</span>
+                <span className="label">{t.gas}</span>
                 <span className="chip" style={{ background: gasAlert ? 'var(--alert)' : undefined, color: gasAlert ? '#fff' : undefined }}>
-                  {gasAlert ? 'Gas level rising, ventilate the room' : 'Safe'}
+                  {gasAlert ? t.alert : t.safe}
                 </span>
               </div>
               <div className="gases">
-                {gases.map(([name, f, v, max]) => (
-                  <div className="gas" key={name}>
+                {gases.map(([key, f, v, max]) => (
+                  <div className="gas" key={key}>
                     <span className="label" style={{ opacity: 0.6 }}>
-                      {name} · {f}
+                      {t.gases[key]} · {f || t.mix}
                     </span>
                     <b>
-                      {v.toFixed(1)}
+                      {v.toLocaleString(T.locale, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}
                       <small style={{ fontSize: 13, marginLeft: 4, opacity: 0.6 }}>ppm</small>
                     </b>
                     <div className="meter">
@@ -136,13 +145,13 @@ export function Air() {
             </div>
           </div>
           <p className="label mute" style={{ marginTop: 14, maxWidth: '62ch', lineHeight: 1.6 }}>
-            Gas values are estimated from the MQ‑6 reading. Without a connected device, this panel shows a realistic simulation.
+            {t.note}
           </p>
         </div>
 
         <div className="phone-wrap">
           <div className="phone" ref={phone} style={{ transform: 'rotateY(-14deg) rotateX(6deg)' }}>
-            <div className="phone__screen" aria-label="RespAI mobile app preview">
+            <div className="phone__screen" aria-label={t.phoneAria} lang="en">
               <div className="app__head">
                 <div className="app__logo" aria-hidden>
                   🫁
@@ -171,10 +180,10 @@ export function Air() {
               </div>
               <div className="app__card">
                 <h5>Gas levels</h5>
-                {gases.slice(0, 3).map(([name, f, v]) => (
-                  <div className="app__row" key={name}>
+                {gases.slice(0, 3).map(([key, f, v]) => (
+                  <div className="app__row" key={key}>
                     <span>
-                      {name} ({f})
+                      {APP_GAS_NAMES[key]} ({f})
                     </span>
                     <b>
                       {Math.round(v)} ppm <span style={{ color: v > 25 ? '#ff5a1f' : '#27ae60' }}>●</span>
