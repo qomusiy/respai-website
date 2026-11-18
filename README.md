@@ -5,7 +5,7 @@
 **Patient and environment monitoring in one small device**
 ECG · cough detection and classification · room air quality
 
-Built in Uzbekistan by team **Invenio** · [respai.uz](https://respai.uz) · [Pitch deck (PDF, Uzbek)](docs/RespAI_prezentatsiya.pdf)
+Built in Uzbekistan by team **Invenio** · [respai.uz](https://respai.uz) · [Pitch deck (PDF, Uzbek)](RespAI_prezentatsiya.pdf)
 
 </div>
 
@@ -289,8 +289,7 @@ public/
   images/                 team photo and other images
   fonts/                  Poppins glyphs for the 3D lettering
   model/                  place for the Edge Impulse WebAssembly export
-docs/
-  RespAI_prezentatsiya.pdf  pitch deck
+RespAI_prezentatsiya.pdf  pitch deck
 ```
 
 ## Market and business model
