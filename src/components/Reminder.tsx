@@ -4,7 +4,6 @@ import { ReminderScene } from '../three/scenes'
 import { live, setOledOverride } from '../lib/live'
 import { gsap } from '../lib/scroll'
 import { Bell } from './icons'
-import { useT } from '../i18n'
 
 let actx: AudioContext | null = null
 function audio() {
@@ -34,7 +33,6 @@ function buzz() {
 }
 
 export function Reminder() {
-  const t = useT().reminder
   const ref = useRef<HTMLElement>(null)
   const ringing = useRef(0)
   const [name, setName] = useState('PARACETAMOL')
@@ -43,7 +41,7 @@ export function Reminder() {
     return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
   })
   const [toast, setToast] = useState<string | null>(null)
-  const [scheduled, setScheduled] = useState<{ time: string; tomorrow: boolean } | null>(null)
+  const [scheduled, setScheduled] = useState<string | null>(null)
   const [countdown, setCountdown] = useState<number | null>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -53,7 +51,7 @@ export function Reminder() {
     setOledOverride('reminder', 9000)
     ringing.current = performance.now() + 2600
     buzz()
-    setToast(label.trim())
+    setToast(`Time to take ${label.trim() || 'your medicine'}`)
     setTimeout(() => setToast(null), 6000)
     setScheduled(null)
     setCountdown(null)
@@ -81,7 +79,7 @@ export function Reminder() {
     at.setHours(h, m, 0, 0)
     if (at.getTime() <= Date.now()) at.setDate(at.getDate() + 1)
     timer.current = setTimeout(() => fire(name, time), at.getTime() - Date.now())
-    setScheduled({ time, tomorrow: at.getDate() !== new Date().getDate() })
+    setScheduled(`${time}${at.getDate() !== new Date().getDate() ? ' tomorrow' : ''}`)
   }
 
   useEffect(() => {
@@ -98,35 +96,36 @@ export function Reminder() {
     <section className="section" id="reminder" ref={ref} aria-labelledby="reminder-title">
       <div className="reminder__grid">
         <div className="reminder__copy above">
-          <span className="eyebrow">{t.eyebrow}</span>
-          <h2 id="reminder-title" className="h2" style={{ margin: '0 0 22px' }}>
-            {t.title}
+          <div className="label">06 — Medication reminder</div>
+          <h2 id="reminder-title" className="h2" style={{ margin: '14px 0 22px' }}>
+            Never miss
+            <br />a dose.
           </h2>
-          <p className="lead">{t.lead}</p>
+          <p className="lead">Taking medicine late can reduce its effectiveness and delay recovery. Schedule doses in the app — RespAI beeps and shows the reminder on its screen.</p>
           <div className="reminder__form">
             <div className="field">
               <label className="label mute" htmlFor="med">
-                {t.medicine}
+                Medicine
               </label>
               <input id="med" value={name} maxLength={10} onChange={(e) => setName(e.target.value.toUpperCase())} autoComplete="off" />
             </div>
             <div className="field">
               <label className="label mute" htmlFor="medtime">
-                {t.time}
+                Time
               </label>
               <input id="medtime" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
             </div>
             <div className="reminder__actions">
               <button className="btn btn--dark" onClick={demo} disabled={countdown !== null}>
-                <Bell /> {countdown !== null ? t.ringing(countdown) : t.tryNow}
+                <Bell /> {countdown !== null ? `Ringing in ${countdown}…` : 'Try it now'}
               </button>
               <button className="btn btn--ghost" onClick={schedule}>
-                {t.schedule}
+                Schedule
               </button>
             </div>
             {scheduled && (
               <p className="label mute" style={{ gridColumn: '1 / -1', margin: '4px 0 0' }}>
-                {t.scheduled(scheduled.time, scheduled.tomorrow)}
+                Scheduled for {scheduled} · keep this tab open
               </p>
             )}
           </div>
@@ -137,13 +136,13 @@ export function Reminder() {
           </View>
         </div>
       </div>
-      {toast !== null && (
+      {toast && (
         <div className="toast" role="status">
           <span className="toast__icon">
             <Bell width={18} height={18} />
           </span>
           <span>
-            <b>{t.toast(toast || t.defaultMedicine)}</b>
+            <b>{toast}</b>
             <span>RespAI · {live.reminderTime}</span>
           </span>
         </div>

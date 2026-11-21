@@ -1,10 +1,8 @@
 import type { MouseEvent } from 'react'
 import { scrollToId } from '../lib/scroll'
 import { Mark } from './icons'
-import { useT } from '../i18n'
 
 export function Footer() {
-  const t = useT().footer
   const go = (id: string) => (e: MouseEvent) => {
     e.preventDefault()
     scrollToId(id)
@@ -17,54 +15,49 @@ export function Footer() {
             <Mark /> RespAI
           </span>
           <p className="mute" style={{ maxWidth: '36ch', marginTop: 14, color: 'var(--on-night-mute)' }}>
-            {t.blurb}
+            A smart cough detector with an air-quality monitor. Developed by team Laputa in Uzbekistan.
           </p>
         </div>
         <div>
           <span className="label" style={{ color: 'var(--on-night-mute)' }}>
-            {t.product}
+            Product
           </span>
           <ul>
             <li>
               <a href="#model" onClick={go('model')}>
-                {t.howItWorks}
+                Resp‑1 model
               </a>
             </li>
             <li>
               <a href="#try" onClick={go('try')}>
-                {t.demo}
+                Try it live
               </a>
             </li>
             <li>
               <a href="#device" onClick={go('device')}>
-                {t.hardware}
+                Device
               </a>
             </li>
             <li>
               <a href="#air" onClick={go('air')}>
-                {t.air}
+                Air quality
               </a>
             </li>
           </ul>
         </div>
         <div>
           <span className="label" style={{ color: 'var(--on-night-mute)' }}>
-            {t.company}
+            Team
           </span>
           <ul>
             <li>
-              <a href="#team" onClick={go('team')}>
-                {t.team}
-              </a>
-            </li>
-            <li>
               <a href="#impact" onClick={go('impact')}>
-                {t.market}
+                Impact
               </a>
             </li>
             <li>
               <a href="#contact" onClick={go('contact')}>
-                {t.pilot}
+                Pilot programme
               </a>
             </li>
             <li>
@@ -76,13 +69,16 @@ export function Footer() {
         </div>
         <div>
           <span className="label" style={{ color: 'var(--on-night-mute)' }}>
-            {t.note}
+            Note
           </span>
-          <p style={{ fontSize: 13, color: 'var(--on-night-mute)', marginTop: 14 }}>{t.noteText}</p>
+          <p style={{ fontSize: 13, color: 'var(--on-night-mute)', marginTop: 14 }}>RespAI is a research prototype, not a medical device. It does not diagnose disease. If a cough persists, see a doctor.</p>
         </div>
       </div>
+      <div className="footer__word" aria-hidden>
+        RespAI
+      </div>
       <div className="footer__legal label" style={{ color: 'var(--on-night-mute)' }}>
-        <span>© {new Date().getFullYear()} Invenio · respai.uz</span>
+        <span>© {new Date().getFullYear()} Laputa · All rights reserved</span>
         <span lang="uz">Har bir nafas muhim</span>
       </div>
     </footer>

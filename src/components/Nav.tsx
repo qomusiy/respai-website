@@ -1,30 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Arrow, Mark } from './icons'
 import { scrollToId, lenis } from '../lib/scroll'
-import { LANGS, useLang, useT } from '../i18n'
 
-const NAV_IDS = ['model', 'try', 'device', 'air', 'team'] as const
-export const DASHBOARD = `${import.meta.env.BASE_URL}dashboard/`
-
-/** EN / UZ / RU switcher */
-export function LangSwitch({ className = '' }: { className?: string }) {
-  const lang = useLang((s) => s.lang)
-  const setLang = useLang((s) => s.setLang)
-  const t = useT()
-  return (
-    <div className={`lang ${className}`} role="group" aria-label={t.nav.language}>
-      {LANGS.map((l) => (
-        <button key={l.code} type="button" lang={l.html} aria-label={l.name} title={l.name} aria-pressed={lang === l.code} className={lang === l.code ? 'is-on' : ''} onClick={() => setLang(l.code)}>
-          {l.short}
-        </button>
-      ))}
-    </div>
-  )
-}
+export const NAV_LINKS = [
+  { id: 'model', label: 'Model' },
+  { id: 'try', label: 'Try it' },
+  { id: 'device', label: 'Device' },
+  { id: 'air', label: 'Air' },
+  { id: 'impact', label: 'Impact' },
+]
 
 export function Nav() {
-  const t = useT()
-  const links = NAV_IDS.map((id) => ({ id, label: t.nav.links[id] }))
   const [scrolled, setScrolled] = useState(false)
   const [dark, setDark] = useState(false)
   const [hidden, setHidden] = useState(false)
@@ -47,11 +33,11 @@ export function Nav() {
       })
       setDark(isDark)
       let cur = ''
-      for (const id of NAV_IDS) {
-        const el = document.getElementById(id)
+      for (const l of NAV_LINKS) {
+        const el = document.getElementById(l.id)
         if (!el) continue
         const r = el.getBoundingClientRect()
-        if (r.top <= window.innerHeight * 0.4 && r.bottom > window.innerHeight * 0.4) cur = id
+        if (r.top <= window.innerHeight * 0.4 && r.bottom > window.innerHeight * 0.4) cur = l.id
       }
       setActive(cur)
     }
@@ -74,26 +60,25 @@ export function Nav() {
   return (
     <>
       <header className={`nav ${scrolled ? 'is-scrolled' : ''} ${dark ? 'is-dark' : ''} ${hidden && !open ? 'is-hidden' : ''} ${open ? 'menu-open' : ''}`}>
-        <a href="#top" className="logo" onClick={go('top')} aria-label={t.nav.home}>
+        <a href="#top" className="logo" onClick={go('top')} aria-label="RespAI home">
           <Mark />
-          RespAI <small>{t.nav.by}</small>
+          RespAI <small>by Laputa</small>
         </a>
-        <nav className="nav__links" aria-label={t.nav.primary}>
-          {links.map((l) => (
+        <nav className="nav__links" aria-label="Primary">
+          {NAV_LINKS.map((l) => (
             <a key={l.id} href={`#${l.id}`} onClick={go(l.id)} className={active === l.id ? 'is-active' : ''}>
               {l.label}
             </a>
           ))}
         </nav>
         <div className="nav__right">
-          <LangSwitch />
-          <a href={DASHBOARD} className={`btn btn--sm nav__cta nav__ai ${dark ? 'btn--night' : 'btn--ghost'}`}>
-            {t.navAnalysis} <span className="nav__beta">{t.dash.beta}</span>
+          <a href="#contact" className={`btn btn--sm nav__cta ${dark ? 'btn--night' : ''}`} onClick={go('contact')}>
+            Get a pilot
           </a>
-          <a href="#contact" className={`btn btn--sm nav__cta ${dark ? 'btn--night' : 'btn--dark'}`} onClick={go('contact')}>
-            {t.nav.cta} <Arrow />
+          <a href="#try" className="btn btn--sm btn--dark nav__cta" onClick={go('try')}>
+            Try Resp‑1 <Arrow />
           </a>
-          <button className={`nav__burger ${open ? 'is-open' : ''}`} onClick={() => setOpen((o) => !o)} aria-label={open ? t.nav.closeMenu : t.nav.openMenu} aria-expanded={open}>
+          <button className={`nav__burger ${open ? 'is-open' : ''}`} onClick={() => setOpen((o) => !o)} aria-label={open ? 'Close menu' : 'Open menu'} aria-expanded={open}>
             <span />
             <span />
           </button>
@@ -101,17 +86,15 @@ export function Nav() {
       </header>
       <div className={`menu ${open ? 'is-open' : ''}`} aria-hidden={!open}>
         <nav>
-          {[...links, { id: 'contact', label: t.nav.links.contact }].map((l) => (
+          {[...NAV_LINKS, { id: 'contact', label: 'Contact' }].map((l, i) => (
             <a key={l.id} href={`#${l.id}`} onClick={go(l.id)} tabIndex={open ? 0 : -1}>
+              <small>0{i + 1}</small>
               {l.label}
             </a>
           ))}
-          <a href={DASHBOARD} tabIndex={open ? 0 : -1}>
-            {t.navAnalysis} <span className="nav__beta">{t.dash.beta}</span>
-          </a>
         </nav>
         <div className="label" style={{ opacity: 0.6 }}>
-          {t.nav.menuFoot}
+          Har bir nafas muhim — every breath matters
         </div>
       </div>
     </>

@@ -1,9 +1,10 @@
 import { useMemo, useRef, type MutableRefObject } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Float, PerspectiveCamera, PresentationControls } from '@react-three/drei'
+import { ContactShadows, Float, PerspectiveCamera, PresentationControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { Device } from './Device'
-import { SoftShadow, StudioLights } from './Stage'
+import { Orb } from './Orb'
+import { StudioLights } from './Stage'
 import { useApp } from '../lib/live'
 
 const S = 0.022 // mm → scene units (device ≈ 2.2 units wide)
@@ -21,7 +22,6 @@ const HERO_POSES: Array<[number, number]> = [
 
 export function HeroScene({ progress }: { progress: MutableRefObject<number> }) {
   const group = useRef<THREE.Group>(null)
-  const shadow = useRef<THREE.Mesh>(null)
   const size = useThree((s) => s.size)
   const aspect = size.width / Math.max(1, size.height)
   const mobile = aspect < 0.95
@@ -43,14 +43,6 @@ export function HeroScene({ progress }: { progress: MutableRefObject<number> }) 
     const ty = (mobile ? -0.35 : -0.08) + p * 1.6
     g.position.x = damp(g.position.x, tx, 4, dt)
     g.position.y = damp(g.position.y, ty, 4, dt)
-    // the floor shadow fades and spreads as the device lifts away on scroll
-    const sh = shadow.current
-    if (sh) {
-      const lift = Math.max(0, g.position.y - (mobile ? -0.35 : -0.08))
-      ;(sh.material as THREE.MeshBasicMaterial).opacity = 0.42 * Math.max(0, 1 - lift * 1.4)
-      sh.position.x = g.position.x
-      sh.scale.set(2.9 + lift, 1.1 + lift * 0.6, 1)
-    }
   })
 
   return (
@@ -64,7 +56,33 @@ export function HeroScene({ progress }: { progress: MutableRefObject<number> }) 
           </group>
         </Float>
       </PresentationControls>
-      <SoftShadow meshRef={shadow} position={[mobile ? 0 : 0.42, mobile ? -1.85 : -1.58, -0.2]} size={[2.9, 1.1]} opacity={0.42} />
+      <ContactShadows position={[mobile ? 0 : 0.42, mobile ? -2 : -1.75, 0]} opacity={0.32} scale={7} blur={2.8} far={3.2} resolution={512} color="#2b2f36" />
+    </>
+  )
+}
+
+// —————————————————————————— ORB ——————————————————————————
+export function OrbScene({ scale = 1, z = 5.2, mobileY = 0 }: { scale?: number; z?: number; mobileY?: number }) {
+  const g = useRef<THREE.Group>(null)
+  const size = useThree((s) => s.size)
+  const aspect = size.width / Math.max(1, size.height)
+  // orb + particles span ~2.4 units: shrink on narrow views so it never overflows
+  const halfW = z * Math.tan(THREE.MathUtils.degToRad(16)) * aspect
+  const fit = Math.min(scale, (halfW * 0.92) / 1.25)
+  const portrait = aspect < 0.95
+  useFrame((state, dt) => {
+    if (!g.current) return
+    g.current.rotation.x = damp(g.current.rotation.x, state.pointer.y * 0.15, 2, dt)
+    g.current.rotation.y = damp(g.current.rotation.y, state.pointer.x * 0.25, 2, dt)
+  })
+  return (
+    <>
+      <PerspectiveCamera makeDefault position={[0, 0, z]} fov={32} />
+      <group position={[0, portrait ? mobileY : 0, 0]}>
+        <group ref={g} scale={fit}>
+          <Orb />
+        </group>
+      </group>
     </>
   )
 }
@@ -101,7 +119,6 @@ export function ExplodedScene({
   const explode = useRef(0)
   const anchors = useRef<Record<string, THREE.Object3D | null>>({})
   const group = useRef<THREE.Group>(null)
-  const shadow = useRef<THREE.Mesh>(null)
   const size = useThree((s) => s.size)
   const camera = useThree((s) => s.camera)
   const mobile = size.width / Math.max(1, size.height) < 0.95
@@ -119,13 +136,6 @@ export function ExplodedScene({
       g.rotation.x = damp(g.rotation.x, 0.1 + e * 0.16 - state.pointer.y * 0.04, 3, dt)
       g.position.x = mobile ? 0.5 * e : 0.62 + e * 0.38
       g.position.y = mobile ? -0.9 : -0.05
-      const sh = shadow.current
-      if (sh) {
-        // parts spread front-to-back (and sideways once rotated): stretch the shadow with them
-        sh.position.x = g.position.x - e * 0.25
-        sh.scale.set(2.9 + e * 1.6, 1.1 + e * 2.2, 1)
-        ;(sh.material as THREE.MeshBasicMaterial).opacity = 0.36 - e * 0.12
-      }
     }
     // centre of the device on screen, to decide label sides
     c.set(0, 0, 0)
@@ -167,7 +177,7 @@ export function ExplodedScene({
       <group ref={group} scale={S}>
         <Device explode={explode} internals anchorsRef={anchors} />
       </group>
-      <SoftShadow meshRef={shadow} position={[mobile ? 0 : 0.62, mobile ? -2.45 : -1.6, -0.1]} size={[2.9, 1.1]} opacity={0.36} />
+      <ContactShadows position={[mobile ? 0 : 0.8, -1.7, 0]} opacity={0.22} scale={9} blur={3} far={4} resolution={512} color="#2b2f36" />
     </>
   )
 }
@@ -211,7 +221,7 @@ export function ReminderScene({ ringing }: { ringing: MutableRefObject<number> }
           <Device />
         </group>
       </Float>
-      <SoftShadow position={[0, -1.5, -0.2]} size={[2.9, 1.1]} opacity={0.4} />
+      <ContactShadows position={[0, -1.6, 0]} opacity={0.3} scale={7} blur={2.6} far={3} resolution={512} color="#2b2f36" />
     </>
   )
 }

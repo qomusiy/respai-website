@@ -67,7 +67,7 @@ function drawStatus(now: number, active: boolean) {
   drawText(ctx, 'RMS:', 0, 27)
   frame(0, 36, 128, 4)
   px(1, 37, Math.round(Math.min(1, level * 1.1) * 126), 2)
-  drawText(ctx, `T:${live.temp.toFixed(1)}C H:${Math.round(live.hum)}% MQ6:${live.mq6 < 10 ? live.mq6.toFixed(1) : Math.round(live.mq6)}`, 0, 47)
+  drawText(ctx, `T:${live.temp.toFixed(1)}C H:${Math.round(live.hum)}% MQ6:${live.mq6.toFixed(1)}`, 0, 47)
   // subtle heartbeat dot so it never looks frozen
   if (Math.floor(now / 500) % 2 === 0) px(125, 0, 2, 2)
 }
@@ -131,7 +131,7 @@ function drawAir(now: number) {
 
 function drawBoot(now: number) {
   drawText(ctx, 'RespAI', (OLED_W - textWidth('RespAI', 3)) / 2, 6, 3)
-  drawText(ctx, 'by Invenio', (OLED_W - textWidth('by Invenio')) / 2, 34)
+  drawText(ctx, 'by Laputa', (OLED_W - textWidth('by Laputa')) / 2, 34)
   const t = (now / 1400) % 1
   frame(14, 50, 100, 6)
   px(16, 52, Math.round(t * 96), 2)
